@@ -10,12 +10,20 @@ dotenv.config();
 
 // Simple lightweight JSON Database for persistence across the user session
 const DB_FILE = path.join(process.cwd(), "data.json");
-let db: { users: any[], anonMessages: any[], ventingLogs: any[] } = { users: [], anonMessages: [], ventingLogs: [] };
+let db: { users: any[], anonMessages: any[], ventingLogs: any[], communityPosts: any[] } = { 
+  users: [], 
+  anonMessages: [], 
+  ventingLogs: [],
+  communityPosts: [
+    { id: "1", author: "إدارة فضفضة", content: "أهلاً بكِ في مجتمعنا الآمن. هذا الفضاء صُنع ليكون ملاذاً للكلمة الطيبة والدعم الصادق. شاركينا تجربتك أو كوني سنداً لأخت لكِ.", createdAt: new Date().toISOString(), likes: 15 }
+  ] 
+};
 
 async function initDB() {
   try {
     const data = await fs.readFile(DB_FILE, "utf-8");
-    db = JSON.parse(data);
+    const parsed = JSON.parse(data);
+    db = { ...db, ...parsed, communityPosts: parsed.communityPosts || db.communityPosts };
   } catch (e) {
     await fs.writeFile(DB_FILE, JSON.stringify(db));
   }
@@ -43,7 +51,7 @@ async function startServer() {
     const user = { id: crypto.randomUUID(), username, password: hashPwd(password), createdAt: new Date().toISOString() };
     db.users.push(user);
     await saveDB();
-    res.json({ success: true, userId: user.id });
+    res.json({ success: true, userId: user.id, username: user.username });
   });
 
   app.post("/api/login", async (req, res) => {
@@ -72,10 +80,70 @@ async function startServer() {
     res.json({ messages: userMsgs });
   });
 
+  app.delete("/api/messages/:msgId", async (req, res) => {
+    const { msgId } = req.params;
+    db.anonMessages = db.anonMessages.filter(m => m.id !== msgId);
+    await saveDB();
+    res.json({ success: true });
+  });
+
+  // --- Community Routes ---
+  app.get("/api/community/posts", async (req, res) => {
+    const posts = [...db.communityPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    res.json({ posts });
+  });
+
+  app.post("/api/community/posts", async (req, res) => {
+    const { content, author } = req.body;
+    if (!content) return res.status(400).json({ error: "Content is required" });
+    
+    const post = {
+      id: crypto.randomUUID(),
+      author: author || "زائرة مجهولة",
+      content,
+      likes: 0,
+      createdAt: new Date().toISOString()
+    };
+    db.communityPosts.push(post);
+    await saveDB();
+    res.json({ success: true, post });
+  });
+
+  app.post("/api/community/posts/:postId/like", async (req, res) => {
+    const { postId } = req.params;
+    const post = db.communityPosts.find(p => p.id === postId);
+    if (post) {
+      post.likes = (post.likes || 0) + 1;
+      await saveDB();
+    }
+    res.json({ success: true });
+  });
+
   // --- Admin Routes ---
+  app.get("/api/admin/stats", async (req, res) => {
+    res.json({
+      usersCount: db.users.length,
+      messagesCount: db.anonMessages.length,
+      ventingSessionsCount: db.ventingLogs.length,
+      communityPostsCount: db.communityPosts.length
+    });
+  });
+
   app.get("/api/admin/logs", async (req, res) => {
     const logs = [...db.ventingLogs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     res.json({ ventingLogs: logs });
+  });
+
+  app.get("/api/admin/users", async (req, res) => {
+    const users = db.users.map(u => ({ id: u.id, username: u.username, createdAt: u.createdAt }));
+    res.json({ users });
+  });
+
+  app.delete("/api/admin/logs/:id", async (req, res) => {
+    const { id } = req.params;
+    db.ventingLogs = db.ventingLogs.filter(l => l.id !== id);
+    await saveDB();
+    res.json({ success: true });
   });
 
   // --- AI Venting Support Route (Multilingual) ---
