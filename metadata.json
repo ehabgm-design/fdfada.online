@@ -1,0 +1,6 @@
+{
+  "name": "فضفضة أونلاين - fdfada.online",
+  "description": "منصة دعم نفسي، مساحة سرية للفضفضة والسكينة بلا أحكام.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
