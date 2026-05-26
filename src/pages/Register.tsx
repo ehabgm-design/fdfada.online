@@ -9,7 +9,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: any) => {
     e.preventDefault();
     if(username.length < 3) {
       setError("اسم المستخدم يجب أن يكون 3 أحرف على الأقل");

@@ -123,8 +123,8 @@ export default function MoodHub() {
                 روتين الإسعاف السريع في هذه اللحظة:
               </h3>
               <ul className="space-y-3">
-                {activeContent.routine.map((step) => (
-                  <li key={step} className="flex items-start gap-3 text-slate-600 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                {activeContent.routine.map((step, idx) => (
+                  <li key={`step-${idx}`} className="flex items-start gap-3 text-slate-600 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                     <ArrowRight className="w-5 h-5 text-indigo-400 mt-0.5 shrink-0 rtl:hidden" />
                     <ArrowRight className="w-5 h-5 text-indigo-400 mt-0.5 shrink-0 hidden rtl:block rotate-180" />
                     <span>{step}</span>

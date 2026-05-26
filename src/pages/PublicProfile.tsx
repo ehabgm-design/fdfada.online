@@ -9,7 +9,7 @@ export default function PublicProfile() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSend = async (e: React.FormEvent) => {
+  const handleSend = async (e: any) => {
     e.preventDefault();
     if (!message.trim()) return;
     setLoading(true);

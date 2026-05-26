@@ -5,16 +5,26 @@ import { Copy, Mail, LogOut, Check, Share2, Trash2 } from "lucide-react";
 export default function UserDashboard() {
   const [messages, setMessages] = useState<any[]>([]);
   const [copied, setCopied] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
 
-  const fetchMessages = () => {
+  const fetchMessages = (isPolling = false) => {
     if (!userId) return;
     fetch(`/api/messages/${userId}`)
       .then(res => res.json())
-      .then(data => setMessages(data.messages || []));
+      .then(data => {
+        const fetchedMessages = data.messages || [];
+        setMessages(prev => {
+          if (isPolling && prev.length > 0 && fetchedMessages.length > prev.length) {
+            setToastMessage("لديك رسالة مصارحة جديدة! 🤫");
+            setTimeout(() => setToastMessage(null), 5000);
+          }
+          return fetchedMessages;
+        });
+      });
   };
 
   useEffect(() => {
@@ -23,6 +33,12 @@ export default function UserDashboard() {
       return;
     }
     fetchMessages();
+    
+    const intervalId = setInterval(() => {
+      fetchMessages(true);
+    }, 10000);
+    
+    return () => clearInterval(intervalId);
   }, [userId, navigate]);
 
   const profileLink = `${window.location.origin}/u/${username}`;
@@ -141,8 +157,8 @@ export default function UserDashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {messages.map(msg => (
-              <div key={msg.id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative group hover:shadow-lg transition-all hover:border-indigo-100 flex flex-col">
+            {messages.map((msg, idx) => (
+              <div key={msg.id || `msg-${idx}`} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative group hover:shadow-lg transition-all hover:border-indigo-100 flex flex-col">
                 <button 
                   onClick={() => deleteMessage(msg.id)}
                   className="absolute top-4 left-4 p-2 bg-slate-50 text-slate-400 rounded-full opacity-0 group-hover:opacity-100 hover:bg-rose-100 hover:text-rose-500 transition-all scale-95 group-hover:scale-100"
@@ -163,6 +179,16 @@ export default function UserDashboard() {
           </div>
         )}
       </div>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 md:bottom-10 bg-slate-900 border border-slate-700 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-5 fade-in duration-300 z-50 whitespace-nowrap">
+          <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center shrink-0">
+            <Mail className="w-4 h-4" />
+          </div>
+          <span className="font-bold text-sm drop-shadow-md">{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 }

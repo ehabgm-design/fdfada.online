@@ -113,8 +113,8 @@ export default function Admin() {
             </h2>
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="divide-y divide-slate-100">
-                {logs.map((log) => (
-                  <div key={log.id} className="p-6 hover:bg-slate-50 transition-colors relative group">
+                {logs.map((log, idx) => (
+                  <div key={log.id || `log-${idx}`} className="p-6 hover:bg-slate-50 transition-colors relative group">
                     <button onClick={() => deleteLog(log.id)} className="absolute top-6 left-6 p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl opacity-0 group-hover:opacity-100 transition-all">
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -146,8 +146,8 @@ export default function Admin() {
           <div className="animate-in fade-in slide-in-from-bottom-4">
             <h2 className="text-2xl font-bold text-slate-800 mb-6">حسابات الزوار المسجلة</h2>
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {users.map(u => (
-                <div key={u.id} className="p-4 border border-slate-100 rounded-2xl bg-slate-50 hover:border-slate-300 transition-colors">
+              {users.map((u, idx) => (
+                <div key={u.id || `user-${idx}`} className="p-4 border border-slate-100 rounded-2xl bg-slate-50 hover:border-slate-300 transition-colors">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 font-bold">
                       {u.username.substring(0, 2).toUpperCase()}

@@ -25,7 +25,7 @@ export default function Community() {
     fetchPosts();
   }, []);
 
-  const handlePost = async (e: React.FormEvent) => {
+  const handlePost = async (e: any) => {
     e.preventDefault();
     if (!newPost.trim()) return;
     setLoading(true);
@@ -103,8 +103,8 @@ export default function Community() {
             لا توجد مشاركات بعد. كوني أول من يشارك رسالة إيجابية!
           </div>
         ) : (
-          posts.map(post => (
-            <div key={post.id} className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:border-amber-100 transition-colors animate-in fade-in">
+          posts.map((post, idx) => (
+            <div key={post.id || `post-${idx}`} className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:border-amber-100 transition-colors animate-in fade-in">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-100 to-rose-100 flex items-center justify-center font-bold text-amber-700 text-lg border border-amber-50">
