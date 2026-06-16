@@ -1,8 +1,19 @@
 import { useState } from "react";
-import { Frown, ThermometerSnowflake, Flame, ArrowRight } from "lucide-react";
+import { Frown, ThermometerSnowflake, Flame, ArrowRight, UserRound, TrendingUp } from "lucide-react";
 import { cn } from "../lib/utils";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 type Mood = "sad" | "anxious" | "angry" | "lonely" | null;
+
+const moodHistory = [
+  { day: 'السبت', moodScore: 3 },
+  { day: 'الأحد', moodScore: 4 },
+  { day: 'الإثنين', moodScore: 2 },
+  { day: 'الثلاثاء', moodScore: 5 },
+  { day: 'الأربعاء', moodScore: 7 },
+  { day: 'الخميس', moodScore: 6 },
+  { day: 'الجمعة', moodScore: 8 },
+];
 
 export default function MoodHub() {
   const [selectedMood, setSelectedMood] = useState<Mood>(null);
@@ -80,12 +91,12 @@ export default function MoodHub() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-        {moods.map((mood) => {
+        {moods.map((mood, idx) => {
           const Icon = mood.icon;
           const isActive = selectedMood === mood.id;
           return (
             <button
-              key={mood.id}
+              key={`mood-${mood.id}-${idx}`}
               onClick={() => setSelectedMood(mood.id as Mood)}
               className={cn(
                 "flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-300",
@@ -135,9 +146,35 @@ export default function MoodHub() {
           </div>
         </div>
       )}
+
+      {/* Mood History Chart */}
+      <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <TrendingUp className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">تاريخ تحسن الحالة المزاجية</h2>
+            <p className="text-sm text-slate-500">نظرة عامة على تقدمك خلال الأسبوع الماضي</p>
+          </div>
+        </div>
+        
+        <div className="h-64 w-full" dir="ltr">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={moodHistory} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+              <YAxis domain={[0, 10]} hide />
+              <Tooltip 
+                contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                labelStyle={{ fontWeight: 'bold', color: '#1e293b', marginBottom: '4px' }}
+                formatter={(value: number) => [`${value}/10`, 'مستوى التحسن']}
+              />
+              <Line type="monotone" dataKey="moodScore" stroke="#6366f1" strokeWidth={3} dot={{ r: 4, fill: '#6366f1', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6, strokeWidth: 0 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 }
-
-// Inline fallback for icon until I add it to lucide-react import list properly if not there
-import { UserRound } from "lucide-react";

@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account registration details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "username": { "type": "string" },
+        "age": { "type": "integer" },
+        "country": { "type": "string" },
+        "language": { "type": "string" },
+        "isPaid": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "username", "country", "createdAt"]
+    },
+    "AnonMessage": {
+      "title": "AnonMessage",
+      "description": "An anonymous secret message sent to a user (Sarahah style)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "message", "createdAt"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "A post published in a specific country/interest community",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "author": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "country": { "type": "string" },
+        "likes": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "author", "content", "category", "country", "createdAt"]
+    },
+    "ChatRoom": {
+      "title": "ChatRoom",
+      "description": "Double opt-in private chat room between two users",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userA": { "type": "string" },
+        "userB": { "type": "string" },
+        "acceptedA": { "type": "boolean" },
+        "acceptedB": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastMessage": { "type": "string" }
+      },
+      "required": ["id", "userA", "userB", "acceptedA", "acceptedB", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles containing public metadata and country/community preference"
+    },
+    "/anonMessages/{msgId}": {
+      "schema": "AnonMessage",
+      "description": "Inboxes for anonymous venting cards"
+    },
+    "/posts/{postId}": {
+      "schema": "Post",
+      "description": "Public social feed posts categorized by country and safe space topic"
+    },
+    "/chats/{chatId}": {
+      "schema": "ChatRoom",
+      "description": "Private chat rooms managing double opt-in agreements"
+    }
+  }
+}

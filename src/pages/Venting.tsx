@@ -85,7 +85,7 @@ export default function Venting() {
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
         {messages.map((msg, idx) => (
           <div 
-            key={msg.id || `msg-${idx}`} 
+            key={`${msg.id}-${idx}`} 
             className={cn(
               "flex gap-4 max-w-[85%] md:max-w-[75%]",
               msg.role === "user" ? "mr-auto flex-row-reverse" : "ml-auto"
