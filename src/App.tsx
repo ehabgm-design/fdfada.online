@@ -26,6 +26,7 @@ import Register from "./pages/Register";
 import UserDashboard from "./pages/UserDashboard";
 import PublicProfile from "./pages/PublicProfile";
 import Members from "./pages/Members";
+import Store from "./pages/Store";
 import { cn } from "./lib/utils";
 
 export default function App() {
@@ -71,6 +72,7 @@ export default function App() {
     { name: "خزانة الأسرار", path: "/venting", icon: MessageSquareHeart, guestFriendly: true },
     { name: "مؤشر الوجدان", path: "/mood", icon: HeartPulse, guestFriendly: true },
     { name: "متنفس السكينة", path: "/relax", icon: Ear, guestFriendly: true },
+    { name: "متجر المنصة", path: "/store", icon: Sparkles, guestFriendly: false },
     { name: "رسائل مجهولة", path: "/dashboard", icon: MailOpen, guestFriendly: false },
     { name: "مجتمع الفتيات", path: "/community", icon: Users, guestFriendly: true },
     { name: "دليل العضوات", path: "/members", icon: Users, guestFriendly: false },
@@ -259,6 +261,7 @@ export default function App() {
           <Route path="/community" element={<Community />} />
           <Route path="/members" element={<Members />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/store" element={<Store />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<UserDashboard />} />

@@ -8,6 +8,7 @@ import crypto from "crypto";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc } from "firebase/firestore";
 import fsModule from "fs";
+import axios from "axios";
 
 dotenv.config();
 
@@ -28,7 +29,18 @@ let db: {
   chats?: any[],
   chatMessages?: any[],
   friendRequests?: any[],
-  friendships?: any[]
+  friendships?: any[],
+  paypalConfig?: {
+    clientId: string;
+    clientSecret: string;
+    coinPrice15: number;
+    coinPrice50: number;
+    coinPrice120: number;
+    diamondPrice: number;
+    goldenPrice: number;
+    sandboxMode: boolean;
+  },
+  transactions?: any[]
 } = { 
   users: [], 
   anonMessages: [], 
@@ -51,7 +63,18 @@ let db: {
   chats: [],
   chatMessages: [],
   friendRequests: [],
-  friendships: []
+  friendships: [],
+  paypalConfig: {
+    clientId: "Afc6Z0D8J8VzX17F0Mv_N7bDwO0_b74L0OqP15091_sandbox",
+    clientSecret: "EOX6f3Yv7M7r8f15xO0f9qDw618vX902L0q_sandbox",
+    coinPrice15: 1.99,
+    coinPrice50: 4.99,
+    coinPrice120: 9.99,
+    diamondPrice: 14.99,
+    goldenPrice: 8.99,
+    sandboxMode: true
+  },
+  transactions: []
 };
 
 // Initialize Firebase using the local config
@@ -216,6 +239,8 @@ async function initDB() {
     db.chatMessages = db.chatMessages && db.chatMessages.length > 0 ? db.chatMessages : (parsed.chatMessages || []);
     db.friendRequests = db.friendRequests && db.friendRequests.length > 0 ? db.friendRequests : (parsed.friendRequests || []);
     db.friendships = db.friendships && db.friendships.length > 0 ? db.friendships : (parsed.friendships || []);
+    db.paypalConfig = parsed.paypalConfig || db.paypalConfig;
+    db.transactions = parsed.transactions || [];
   } catch (e) {
     await fs.writeFile(DB_FILE, JSON.stringify(db, null, 2));
   }
@@ -314,11 +339,14 @@ async function startServer() {
       country: country || "العالم العربي",
       language: language || "ar",
       isPaid: false,
+      coins: 10,
+      subscriptionType: "free",
+      subscriptionExpiresAt: null,
       createdAt: new Date().toISOString() 
     };
     db.users.push(user);
     await saveDB();
-    res.json({ success: true, userId: user.id, username: user.username, age: user.age, country: user.country });
+    res.json({ success: true, userId: user.id, username: user.username, age: user.age, country: user.country, coins: user.coins, subscriptionType: user.subscriptionType });
   });
 
   app.post("/api/login", async (req, res) => {
@@ -331,7 +359,10 @@ async function startServer() {
       username: user.username, 
       age: user.age, 
       country: user.country,
-      isPaid: user.isPaid 
+      isPaid: user.isPaid || false,
+      coins: user.coins !== undefined ? user.coins : 10,
+      subscriptionType: user.subscriptionType || "free",
+      subscriptionExpiresAt: user.subscriptionExpiresAt || null
     });
   });
 
@@ -860,8 +891,306 @@ async function startServer() {
       avatarEmoji: user.avatarEmoji || "🌸",
       bio: user.bio || "",
       isPaid: user.isPaid,
+      coins: user.coins !== undefined ? user.coins : 10,
+      subscriptionType: user.subscriptionType || "free",
+      subscriptionExpiresAt: user.subscriptionExpiresAt || null,
       isOnboarded: user.isOnboarded || false
     });
+  });
+
+  // --- PayPal & Subscriptions Config Endpoints ---
+  app.get("/api/admin/paypal-config", (req, res) => {
+    res.json(db.paypalConfig || {
+      clientId: "AdHrd3tLCwYhp4SnvgyI5-5sylRn-3e0IToT4ACNR8UdDN8zlle4JW22zXnOW25BqUQ2_Bd8QKTVzgPP",
+      clientSecret: "EI8jv-uS5xhEn5FoWkAesM3Mq7XVGC1whtL3xYWbpPINv1m22u82XmSQ7A7owVKKaG6yvZ8a8hTxStg7",
+      coinPrice15: 1.99,
+      coinPrice50: 4.99,
+      coinPrice120: 9.99,
+      diamondPrice: 14.99,
+      goldenPrice: 8.99,
+      sandboxMode: false
+    });
+  });
+
+  app.post("/api/admin/paypal-config", async (req, res) => {
+    const { clientId, clientSecret, coinPrice15, coinPrice50, coinPrice120, diamondPrice, goldenPrice, sandboxMode } = req.body;
+    db.paypalConfig = {
+      clientId: clientId || "AdHrd3tLCwYhp4SnvgyI5-5sylRn-3e0IToT4ACNR8UdDN8zlle4JW22zXnOW25BqUQ2_Bd8QKTVzgPP",
+      clientSecret: clientSecret || "EI8jv-uS5xhEn5FoWkAesM3Mq7XVGC1whtL3xYWbpPINv1m22u82XmSQ7A7owVKKaG6yvZ8a8hTxStg7",
+      coinPrice15: Number(coinPrice15) || 1.99,
+      coinPrice50: Number(coinPrice50) || 4.99,
+      coinPrice120: Number(coinPrice120) || 9.99,
+      diamondPrice: Number(diamondPrice) || 14.99,
+      goldenPrice: Number(goldenPrice) || 8.99,
+      sandboxMode: sandboxMode !== undefined ? sandboxMode : false
+    };
+    await saveDB();
+    res.json({ success: true, config: db.paypalConfig });
+  });
+
+  app.get("/api/admin/transactions", (req, res) => {
+    res.json({ success: true, transactions: db.transactions || [] });
+  });
+
+  // Client requests config
+  app.get("/api/paypal/config", (req, res) => {
+    const config = db.paypalConfig || {
+      clientId: "AdHrd3tLCwYhp4SnvgyI5-5sylRn-3e0IToT4ACNR8UdDN8zlle4JW22zXnOW25BqUQ2_Bd8QKTVzgPP",
+      coinPrice15: 1.99,
+      coinPrice50: 4.99,
+      coinPrice120: 9.99,
+      diamondPrice: 14.99,
+      goldenPrice: 8.99
+    };
+    res.json({ success: true, clientId: config.clientId, prices: config });
+  });
+
+  // Create local pending order before sending to PayPal
+  app.post("/api/payments/paypal/create-order", async (req, res) => {
+    const { userId, packId } = req.body;
+    const user = db.users.find(u => u.id === userId);
+    if (!user) return res.status(404).json({ error: "المستخدمة غير مسجلة في قاعدة البيانات" });
+
+    const config = db.paypalConfig || {
+      coinPrice15: 1.99,
+      coinPrice50: 4.99,
+      coinPrice120: 9.99,
+      diamondPrice: 14.99,
+      goldenPrice: 8.99
+    };
+
+    let amount = 0;
+    if (packId === "15coins") amount = config.coinPrice15;
+    else if (packId === "50coins") amount = config.coinPrice50;
+    else if (packId === "120coins") amount = config.coinPrice120;
+    else if (packId === "golden") amount = config.goldenPrice;
+    else if (packId === "diamond") amount = config.diamondPrice;
+
+    res.json({ success: true, amount });
+  });
+
+  // Capture PayPal Order and Validate via PayPal API
+  app.post("/api/payments/paypal/capture-order", async (req, res) => {
+    try {
+      const { orderId, userId, packId } = req.body;
+      const user = db.users.find(u => u.id === userId);
+      if (!user) return res.status(404).json({ error: "المستخدمة غير مسجلة" });
+
+      const config = db.paypalConfig || {
+        clientId: "AdHrd3tLCwYhp4SnvgyI5-5sylRn-3e0IToT4ACNR8UdDN8zlle4JW22zXnOW25BqUQ2_Bd8QKTVzgPP",
+        clientSecret: "EI8jv-uS5xhEn5FoWkAesM3Mq7XVGC1whtL3xYWbpPINv1m22u82XmSQ7A7owVKKaG6yvZ8a8hTxStg7",
+        sandboxMode: false
+      };
+
+      const baseURL = config.sandboxMode ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
+      const auth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString("base64");
+      
+      // Verify the order on PayPal
+      const rx = await axios.get(`${baseURL}/v2/checkout/orders/${orderId}`, {
+        headers: { "Authorization": `Basic ${auth}` }
+      });
+      const paypalData = rx.data;
+
+      if (paypalData.status !== "COMPLETED" && paypalData.status !== "APPROVED") {
+        return res.status(400).json({ error: "العملية لم تكتمل في PayPal" });
+      }
+
+      const txId = orderId;
+      const newTx = {
+        id: txId,
+        userId,
+        username: user.username,
+        packId,
+        amount: paypalData.purchase_units[0].amount.value,
+        status: "completed",
+        paypalDetails: paypalData,
+        createdAt: new Date().toISOString()
+      };
+      if (!db.transactions) db.transactions = [];
+      db.transactions.push(newTx);
+
+      // Provision the purchased pack
+      if (packId === "15coins") {
+        user.coins = (user.coins !== undefined ? user.coins : 10) + 15;
+      } else if (packId === "50coins") {
+        user.coins = (user.coins !== undefined ? user.coins : 10) + 50;
+      } else if (packId === "120coins") {
+        user.coins = (user.coins !== undefined ? user.coins : 10) + 120;
+      } else if (packId === "golden") {
+        user.subscriptionType = "golden";
+        user.isPaid = true;
+        user.subscriptionExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      } else if (packId === "diamond") {
+        user.subscriptionType = "diamond";
+        user.isPaid = true;
+        user.subscriptionExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      }
+
+      await saveDB();
+      res.json({
+        success: true,
+        coins: user.coins || 0,
+        subscriptionType: user.subscriptionType || "free",
+        subscriptionExpiresAt: user.subscriptionExpiresAt || null
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Internal Server Error or Invalid PayPal Order" });
+    }
+  });
+
+  // PayPal Webhook Listener for asynchronous updates and real integrations
+  app.post("/api/payments/paypal/webhook", async (req, res) => {
+    try {
+      const event = req.body;
+      console.log("🔔 PayPal Webhook Received: ", event.event_type);
+
+      // Respond immediately to acknowledge receipt to PayPal
+      res.status(200).send("OK");
+
+      // We only process CHECKOUT.ORDER.APPROVED or PAYMENT.CAPTURE.COMPLETED
+      if (event.event_type === "PAYMENT.CAPTURE.COMPLETED") {
+        const resource = event.resource;
+        const customId = resource.custom_id; // e.g., "userId|packId"
+        if (!customId) return;
+
+        const [userId, packId] = customId.split("|");
+        const orderId = resource.supplementary_data?.related_ids?.order_id || resource.id;
+
+        // Ensure we haven't already processed this order
+        const existingTx = db.transactions?.find(t => t.id === orderId || t.id === resource.id);
+        if (existingTx && existingTx.status === "completed") return; // Already processed by frontend capture
+
+        const user = db.users.find(u => u.id === userId);
+        if (!user) return;
+
+        const newTx = {
+          id: orderId || resource.id,
+          userId,
+          username: user.username,
+          packId,
+          amount: resource.amount?.value,
+          status: "completed",
+          paypalDetails: resource,
+          createdAt: new Date().toISOString()
+        };
+
+        if (!db.transactions) db.transactions = [];
+        db.transactions.push(newTx);
+
+        // Provision the pack asynchronously from webhook
+        if (packId === "15coins") {
+          user.coins = (user.coins !== undefined ? user.coins : 10) + 15;
+        } else if (packId === "50coins") {
+          user.coins = (user.coins !== undefined ? user.coins : 10) + 50;
+        } else if (packId === "120coins") {
+          user.coins = (user.coins !== undefined ? user.coins : 10) + 120;
+        } else if (packId === "golden") {
+          user.subscriptionType = "golden";
+          user.isPaid = true;
+          user.subscriptionExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        } else if (packId === "diamond") {
+          user.subscriptionType = "diamond";
+          user.isPaid = true;
+          user.subscriptionExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        }
+
+        user.notifications = user.notifications || [];
+        user.notifications.push({
+          id: Date.now().toString(),
+          title: "عملية دفع ناجحة 💳",
+          message: `تم إضافة ${packId} إلى حسابك بنجاح من خلال إشعار PayPal الآلي.`,
+          date: new Date().toISOString(),
+          read: false,
+          type: "system"
+        });
+
+        await saveDB();
+        console.log("✅ PayPal Webhook processed successfully for order: ", orderId);
+      }
+    } catch (err) {
+      console.error("Webhook processing error:", err);
+    }
+  });
+
+  // Seamless Live Simulation Option (Mock Checkout) for rapid demo verification
+  app.post("/api/payments/paypal/simulate", async (req, res) => {
+    const { userId, packId } = req.body;
+    const user = db.users.find(u => u.id === userId);
+    if (!user) return res.status(444).json({ error: "المستخدمة غير مسجلة" });
+
+    const config = db.paypalConfig || {
+      coinPrice15: 1.99,
+      coinPrice50: 4.99,
+      coinPrice120: 9.99,
+      diamondPrice: 14.99,
+      goldenPrice: 8.99
+    };
+
+    let amount = 0;
+    if (packId === "15coins") amount = config.coinPrice15;
+    else if (packId === "50coins") amount = config.coinPrice50;
+    else if (packId === "120coins") amount = config.coinPrice120;
+    else if (packId === "golden") amount = config.goldenPrice;
+    else if (packId === "diamond") amount = config.diamondPrice;
+
+    const mockId = "SIM-PAY-" + crypto.randomBytes(8).toString("hex").toUpperCase();
+    const transaction = {
+      id: mockId,
+      userId,
+      username: user.username,
+      packId,
+      amount,
+      status: "completed_simulation",
+      createdAt: new Date().toISOString()
+    };
+    if (!db.transactions) db.transactions = [];
+    db.transactions.push(transaction);
+
+    // Provision
+    if (packId === "15coins") {
+      user.coins = (user.coins !== undefined ? user.coins : 10) + 15;
+    } else if (packId === "50coins") {
+      user.coins = (user.coins !== undefined ? user.coins : 10) + 50;
+    } else if (packId === "120coins") {
+      user.coins = (user.coins !== undefined ? user.coins : 10) + 120;
+    } else if (packId === "golden") {
+      user.subscriptionType = "golden";
+      user.isPaid = true;
+      user.subscriptionExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    } else if (packId === "diamond") {
+      user.subscriptionType = "diamond";
+      user.isPaid = true;
+      user.subscriptionExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    }
+
+    await saveDB();
+    res.json({
+      success: true,
+      coins: user.coins,
+      subscriptionType: user.subscriptionType,
+      subscriptionExpiresAt: user.subscriptionExpiresAt
+    });
+  });
+
+  // Deduct coins backend
+  app.post("/api/payments/deduct-coins", async (req, res) => {
+    const { userId, amount } = req.body;
+    const user = db.users.find(u => u.id === userId);
+    if (!user) return res.status(404).json({ error: "المستخدمة غير مسجلة" });
+
+    // Subscription users are standard unlimited
+    const isPremium = user.subscriptionType === "golden" || user.subscriptionType === "diamond";
+    if (isPremium) {
+      return res.json({ success: true, coins: user.coins !== undefined ? user.coins : 10, isPremium });
+    }
+
+    const currentCoins = user.coins !== undefined ? user.coins : 10;
+    const toDeduct = Number(amount) || 1;
+    user.coins = Math.max(0, currentCoins - toDeduct);
+
+    await saveDB();
+    res.json({ success: true, coins: user.coins, isPremium: false });
   });
 
   // --- Admin Config Endpoints ---
@@ -1066,11 +1395,18 @@ async function startServer() {
 
   // --- Admin Routes ---
   app.get("/api/admin/stats", async (req, res) => {
+    const completedTransactions = (db.transactions || []).filter(t => t.status === "completed" || t.status === "completed_simulation");
+    const totalEarnings = completedTransactions.reduce((acc, t) => acc + (t.amount || 0), 0);
+    const premiumUsersCount = db.users.filter(u => u.subscriptionType === "golden" || u.subscriptionType === "diamond").length;
+
     res.json({
       usersCount: db.users.length,
       messagesCount: db.anonMessages.length,
       ventingSessionsCount: db.ventingLogs.length,
-      communityPostsCount: db.communityPosts.length
+      communityPostsCount: db.communityPosts.length,
+      premiumUsersCount,
+      transactionsCount: completedTransactions.length,
+      totalEarnings: parseFloat(totalEarnings.toFixed(2))
     });
   });
 
@@ -1080,7 +1416,13 @@ async function startServer() {
   });
 
   app.get("/api/admin/users", async (req, res) => {
-    const users = db.users.map(u => ({ id: u.id, username: u.username, createdAt: u.createdAt }));
+    const users = db.users.map(u => ({ 
+      id: u.id, 
+      username: u.username, 
+      createdAt: u.createdAt,
+      coins: u.coins !== undefined ? u.coins : 10,
+      subscriptionType: u.subscriptionType || "free"
+    }));
     res.json({ users });
   });
 

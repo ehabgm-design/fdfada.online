@@ -609,21 +609,39 @@ export default function UserDashboard() {
           </button>
         </div>
 
-        <div className="order-1 md:order-2 flex items-center gap-4 bg-white p-3 pr-5 pl-4 rounded-3xl border border-slate-100 shadow-sm">
-          <div className="text-right">
-            <h1 className="text-xl font-bold text-slate-800 flex items-center gap-1.5 justify-end">
-              أهلاً بكِ، {profile?.displayName || username}
-            </h1>
-            <p className="text-slate-400 flex items-center justify-end gap-1.5 mt-0.5 text-xs">
-              <span className="font-mono">@{profile?.username || username}</span> • 
-              <span className="text-emerald-500 font-bold bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> نشط وجاهز
-              </span>
-            </p>
-          </div>
+        <div className="order-1 md:order-2 flex flex-col items-end gap-2">
+          <div className="flex items-center gap-4 bg-white p-3 pr-5 pl-4 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="text-right">
+              <h1 className="text-xl font-bold text-slate-800 flex items-center gap-1.5 justify-end">
+                أهلاً بكِ، {profile?.displayName || username}
+                {profile?.subscriptionType === 'diamond' && <span className="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse">💎 ماسية</span>}
+                {profile?.subscriptionType === 'golden' && <span className="bg-yellow-100 text-yellow-700 text-[10px] px-2 py-0.5 rounded-full font-black">👑 ذهبية</span>}
+              </h1>
+              <p className="text-slate-400 flex items-center justify-end gap-1.5 mt-0.5 text-xs">
+                <span className="font-mono">@{profile?.username || username}</span> • 
+                <span className="text-emerald-500 font-bold bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> نشط وجاهز
+                </span>
+              </p>
+            </div>
 
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-50 to-indigo-50 border border-teal-100/50 flex items-center justify-center text-3xl shadow-sm hover:rotate-6 transition-transform">
-            {profile?.avatarEmoji || "🌸"}
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-50 to-indigo-50 border border-teal-100/50 flex items-center justify-center text-3xl shadow-sm hover:rotate-6 transition-transform">
+              {profile?.avatarEmoji || "🌸"}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {profile?.coins !== undefined && (
+              <span className="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1 cursor-default">
+                رصيدك: {profile.coins} كوينز
+              </span>
+            )}
+            <button
+               onClick={() => navigate('/store')} 
+               className="bg-teal-100 text-teal-700 hover:bg-teal-200 text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1 transition-colors"
+            >
+              شحن الرصيد / ترقية الإشتراك
+            </button>
           </div>
         </div>
       </div>
