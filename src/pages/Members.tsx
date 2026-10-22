@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Users, Search, MapPin, Send, UserPlus, UserCheck, Check, Clock, UserCheck2 } from "lucide-react";
+import GuestLock from "../components/GuestLock";
 
 const COUNTRY_FLAGS: { [key: string]: string } = {
   "مصر": "🇪🇬",
@@ -139,6 +140,16 @@ export default function Members() {
     }
     return { status: "none", label: "إضافة لصديقاتي 🤝" };
   };
+
+  if (!currentUserId) {
+    return (
+      <GuestLock 
+        title="دليل شقيقات وعضوات فضفضة أونلاين 🌸"
+        description="هذا القسم مخصص حصريًا للتواصل الوجداني المباشر والتعارف الآمن بين العضوات والفتيات بالبلدان العربية بخصوصية تامة. سجلي دخولكِ الآن لتصفح رفيقاتك وتفعيل ميزة طلبات المصادقة."
+        featureBadge="دليل العضوات المشفر"
+      />
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-8 font-sans">

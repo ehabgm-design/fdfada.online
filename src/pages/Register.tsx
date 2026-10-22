@@ -9,6 +9,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [age, setAge] = useState("18 - 25 سنة (شابة يافعة)");
   const [country, setCountry] = useState("مصر");
+  const [gender, setGender] = useState<"female" | "male">("female");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function Register() {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, age, country })
+        body: JSON.stringify({ username, password, age, country, gender })
       });
       const data = await res.json();
       if (res.ok) {
@@ -34,6 +35,7 @@ export default function Register() {
         localStorage.setItem("displayName", username);
         localStorage.setItem("userAge", age);
         localStorage.setItem("userCountry", country);
+        localStorage.setItem("userGender", data.gender || gender);
         navigate("/dashboard");
       } else {
         setError(data.error === "Username taken" ? "اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر" : "خطأ غير معروف");
@@ -69,6 +71,7 @@ export default function Register() {
         localStorage.setItem("displayName", data.displayName || name);
         if (data.age) localStorage.setItem("userAge", data.age);
         if (data.country) localStorage.setItem("userCountry", data.country);
+        localStorage.setItem("userGender", data.gender || "female");
         navigate("/dashboard");
       } else {
         setError(data.error || "فشل التسجيل والتزامن بواسطة جوجل");
@@ -118,14 +121,44 @@ export default function Register() {
 
         <form onSubmit={handleRegister} className="space-y-4 font-sans text-right">
           <div>
-            <label className="block text-xs font-bold text-slate-705 mb-1.5">اسم المستخدم (مستعار / باللاتينية)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">المجتمع والديوان المفرز هويتياً 🛡️🌸</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setGender("female")}
+                className={`p-3 rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
+                  gender === "female"
+                    ? "border-rose-gold bg-plum text-white shadow-md scale-[1.02]"
+                    : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <span className="text-xl">🌸</span>
+                <span className="text-[11px] font-black">ديوان الزاهرات (إناث)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setGender("male")}
+                className={`p-3 rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
+                  gender === "male"
+                    ? "border-rose-gold bg-plum text-white shadow-md scale-[1.02]"
+                    : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <span className="text-xl">🛡️</span>
+                <span className="text-[11px] font-black">مجلس الفرسان (ذكور)</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">اسم المستخدم (مستعار / باللاتينية)</label>
             <input 
               type="text" 
               required
               value={username}
               onChange={e=>setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
               placeholder="مثال: yasmin_safe"
-              className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-left text-sm" 
+              className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-plum/20 focus:border-plum text-left text-sm" 
               dir="ltr"
             />
           </div>
@@ -137,7 +170,7 @@ export default function Register() {
               placeholder="••••••••"
               value={password}
               onChange={e=>setPassword(e.target.value)}
-              className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm" 
+              className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-plum/20 focus:border-plum text-sm" 
             />
           </div>
 
@@ -147,7 +180,7 @@ export default function Register() {
               <select 
                 value={age}
                 onChange={e=>setAge(e.target.value)}
-                className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs"
+                className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-plum/20 focus:border-plum text-xs"
               >
                 <option value="تحت 18 سنة (فتاة مراهقة)">تحت 18 سنة (فتاة مراهقة)</option>
                 <option value="18 - 25 سنة (شابة يافعة)">18 - 25 سنة (شابة يافعة)</option>
@@ -161,7 +194,7 @@ export default function Register() {
               <select 
                 value={country}
                 onChange={e=>setCountry(e.target.value)}
-                className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs"
+                className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-plum/20 focus:border-plum text-xs"
               >
                 <option value="مصر">مصر 🇪🇬</option>
                 <option value="السعودية">السعودية 🇸🇦</option>
@@ -178,13 +211,13 @@ export default function Register() {
             </div>
           </div>
 
-          <button disabled={loading} type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-2xl hover:bg-indigo-700 transition-colors mt-4 text-sm active:scale-95">
+          <button disabled={loading} type="submit" className="w-full bg-plum text-white font-bold py-3.5 rounded-2xl hover:bg-velvet transition-colors mt-4 text-sm active:scale-95 shadow-md shadow-plum/10">
             {loading ? "جاري إنشاء حسابك السري..." : "إنشاء الحساب والانضمام السري"}
           </button>
         </form>
 
         <p className="text-center text-sm text-slate-500 mt-6">
-          لديك حساب بالفعل؟ <Link to="/login" className="text-indigo-600 font-bold hover:underline">تسجيل الدخول</Link>
+          لديك حساب بالفعل؟ <Link to="/login" className="text-plum font-bold hover:underline">تسجيل الدخول</Link>
         </p>
       </div>
     </div>

@@ -1,159 +1,136 @@
 import { useState, useEffect } from "react";
-import { Copy, DiscAlbum, CheckCircle2, Crown, Sparkles, Gem, ShieldAlert } from "lucide-react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { Sparkles, CheckCircle2, Gift, Heart, ShieldAlert, Star, Award, HeartHandshake } from "lucide-react";
+import GuestLock from "../components/GuestLock";
+import { getWhatsAppUrl, WhatsAppIcon, WHATSAPP_NUMBER } from "../components/WhatsAppSupport";
 
 export default function Store() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [paypalConfig, setPaypalConfig] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-
-  const [activePack, setActivePack] = useState<string | null>(null);
+  const [userCoins, setUserCoins] = useState<number>(100);
 
   useEffect(() => {
     setUserId(localStorage.getItem("userId"));
-    fetch("/api/paypal/config")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setPaypalConfig(data);
-        setLoading(false);
-      });
+    const storedCoins = localStorage.getItem("userCoins");
+    if (storedCoins) {
+      setUserCoins(parseInt(storedCoins, 10) || 100);
+    }
   }, []);
 
-  const handleCapture = async (orderId: string, packId: string) => {
-    try {
-      const res = await fetch("/api/payments/paypal/capture-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, userId, packId })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSuccessMsg(`🎉 تمت عملية الدفع بنجاح! رصيدك الحالي: ${data.coins} كوينز.`);
-        setTimeout(() => setSuccessMsg(""), 5000);
-      } else {
-        setErrorMsg(data.error || "فشل التحقق من الدفع.");
-      }
-    } catch (e) {
-      setErrorMsg("حدث خطأ أثناء معالجة الدفع.");
-    }
+  const handleClaimGift = (packName: string, coinsAdded: number) => {
+    const newCoins = userCoins + coinsAdded;
+    setUserCoins(newCoins);
+    localStorage.setItem("userCoins", newCoins.toString());
+    setSuccessMsg(`🎁 مبروك! حصلتِ على "${packName}" وتمت إضافة ${coinsAdded} كوينز مجانية إلى محفظتك في فضفضة أونلاين 🌸`);
+    setTimeout(() => setSuccessMsg(""), 5000);
   };
 
-  const PACKS = [
-    { id: "15coins", name: "محفظة البداية - 15 كوينز", priceKey: 'coinPrice15', icon: Sparkles, color: "amber" },
-    { id: "50coins", name: "محفظة التألق - 50 كوينز", priceKey: 'coinPrice50', icon: DiscAlbum, color: "orange" },
-    { id: "120coins", name: "المحفظة الفاخرة - 120 كوينز", priceKey: 'coinPrice120', icon: Gem, color: "teal" },
-    { id: "golden", name: "الباقة الذهبية (شهر)", priceKey: 'goldenPrice', icon: Crown, color: "yellow" },
-    { id: "diamond", name: "العضوية الماسية (شهر)", priceKey: 'diamondPrice', icon: Crown, color: "purple" }
+  const FREE_PACKS = [
+    { 
+      id: "gift_welcome", 
+      name: "هدية البداية والترحيب 🌸", 
+      coins: 50, 
+      desc: "احصلي فوراً على 50 كوينز هدية مجانية لتشجيعكِ على إرسال أول رسالة صراحة ومشاركة مشاعركِ بأمان.",
+      icon: Sparkles,
+      color: "rose"
+    },
+    { 
+      id: "gift_support", 
+      name: "وسام الدعم والسكينة النفسية 🤍", 
+      coins: 100, 
+      desc: "رصيد إضافي مجاني مخصص لتعزيز صندوق صراحة الخاص بكِ والتفاعل مع رسائل الصديقات.",
+      icon: Heart,
+      color: "teal"
+    },
+    { 
+      id: "gift_vip", 
+      name: "الباقة المجانية الشاملة (دائمة) 👑", 
+      coins: 250, 
+      desc: "عضوية مفتوحة ومجانية تماماً بالكامل طوال فترة استخدامك للمنصة ودون أي رسوم أو اشتراكات.",
+      icon: Award,
+      color: "amber"
+    }
   ];
 
-  if (loading) return <div className="p-12 text-center text-slate-500">جاري تحميل الباقات والدفع الآمن...</div>;
-  if (!userId) return <div className="p-12 text-center font-bold text-slate-700">الرجاء تسجيل الدخول أولاً للوصول إلى المتجر.</div>;
+  if (!userId) {
+    return (
+      <GuestLock 
+        title="متجر المنصة المجاني • هدايا ومساعدات العضوات 💎"
+        description="جميع خدمات ومنصة فضفضة أونلاين مجانية بالكامل 100%. سجلي دخولكِ للحصول على رصيدكِ المجاني من الكوينز وهدايا الدعم النفسي وصندوق الصراحة."
+        featureBadge="متجر المنصة المجاني"
+      />
+    );
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8 font-sans">
-      <div className="mb-10 text-right">
-        <h1 className="text-3xl font-black text-slate-800 flex items-center justify-end gap-2 mb-2">
-          متجر المنصة الآمن <ShieldAlert className="text-teal-600" />
+    <div className="max-w-4xl mx-auto p-4 md:p-8 font-sans rtl text-right" dir="rtl">
+      <div className="mb-10">
+        <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-black px-3.5 py-1.5 rounded-full mb-3 border border-emerald-200">
+          <Sparkles className="w-4 h-4 text-emerald-600" />
+          <span>منصة مجانية بالكامل 100% • بدون أي رسوم أو باقات مدفوعة 🌸</span>
+        </div>
+        <h1 className="text-3xl font-black text-slate-900 flex items-center justify-end gap-2 mb-2">
+          متجر المنصة المجاني والهدايا الوجدانية <Gift className="text-teal-600" />
         </h1>
-        <p className="text-slate-500 text-sm">احصلي على كوينز وتطويرات لعضويتك بكل سرية وآمان عن طريق بوابة PayPal العالمية.</p>
+        <p className="text-slate-600 text-sm">
+          رصيدك الحالي في المحفظة المجانية: <strong className="text-teal-700 font-mono text-base">{userCoins} كوينز مجانية</strong> 💎
+        </p>
       </div>
 
       {successMsg && (
-        <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold text-center flex items-center justify-center gap-2">
-          <CheckCircle2 className="w-5 h-5" />
-          {successMsg}
+        <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold text-center flex items-center justify-center gap-2 shadow-sm">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <span>{successMsg}</span>
         </div>
       )}
 
-      {errorMsg && (
-        <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-bold text-center flex items-center justify-center gap-2">
-          {errorMsg}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-right rtl">
-        {PACKS.map(pack => {
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {FREE_PACKS.map(pack => {
           const Icon = pack.icon;
-          const price = paypalConfig?.prices?.[pack.priceKey];
-
           return (
-            <div key={pack.id} className={`p-6 rounded-3xl border-2 flex flex-col justify-between transition-all bg-white shadow-sm ${activePack === pack.id ? 'border-teal-500 scale-105 shadow-xl' : 'border-slate-100 hover:border-slate-300'}`}>
+            <div key={pack.id} className="p-6 rounded-3xl border-2 border-slate-100 hover:border-teal-500 bg-white shadow-sm flex flex-col justify-between transition-all group">
               <div>
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 bg-${pack.color}-100 text-${pack.color}-600`}>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors">
                   <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="font-bold text-slate-800 mb-2">{pack.name}</h3>
-                <p className="text-2xl font-black text-slate-900 font-mono">${price}</p>
-                <div className="mt-4 space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-4">
-                  {pack.id.includes("coins") ? (
-                    <>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> رصيد يضاف فوراً لمحفظتك</p>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> لا تنتهي صلاحية الكوينز</p>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> استخدميها في الدردشات أو الهدايا</p>
-                    </>
-                  ) : pack.id === "golden" ? (
-                    <>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> شارة الباقة الذهبية في ملفك</p>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> أولوية في الظهور بالردود</p>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> صلاحية 30 يوماً</p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> شارة العضوية الماسية المميزة</p>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> إمكانيات غير محدودة للدردشة</p>
-                      <p className="flex items-center gap-2"><CheckCircle2 className={`w-4 h-4 text-${pack.color}-500`} /> صلاحية 30 يوماً</p>
-                    </>
-                  )}
-                </div>
+                <h3 className="font-bold text-slate-800 mb-2 text-base">{pack.name}</h3>
+                <p className="text-2xl font-black text-teal-700 font-mono mb-3">+{pack.coins} كوينز مجانية</p>
+                <p className="text-xs text-slate-600 leading-relaxed mb-6">{pack.desc}</p>
               </div>
 
-              <div className="mt-6">
-                {activePack === pack.id && paypalConfig?.clientId ? (
-                  <PayPalScriptProvider options={{ clientId: paypalConfig.clientId, currency: "USD", intent: "capture" }}>
-                    <PayPalButtons 
-                      style={{ layout: "horizontal", height: 40, color: "black", tagline: false }}
-                      createOrder={(data, actions) => {
-                        return actions.order.create({
-                          purchase_units: [{
-                            amount: { value: price.toString(), currency_code: "USD" },
-                            description: pack.name,
-                            custom_id: `${userId}|${pack.id}`
-                          }]
-                        });
-                      }}
-                      onApprove={(data, actions) => {
-                        return handleCapture(data.orderID, pack.id);
-                      }}
-                      onCancel={() => {
-                        setActivePack(null);
-                        setErrorMsg("تم إلغاء عملية الدفع.");
-                      }}
-                      onError={(err) => {
-                        console.error("PayPal Error:", err);
-                        setErrorMsg("حدث خطأ في بطاقة الدفع أو الاتصال بـ PayPal.");
-                      }}
-                    />
-                  </PayPalScriptProvider>
-                ) : (
-                  <button 
-                    onClick={() => {
-                      setActivePack(pack.id);
-                      setErrorMsg("");
-                      setSuccessMsg("");
-                    }}
-                    className="w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition active:scale-95"
-                  >
-                    شراء الآن بصلاحية وسرية
-                  </button>
-                )}
-              </div>
+              <button 
+                onClick={() => handleClaimGift(pack.name, pack.coins)}
+                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-teal-600 text-white font-bold text-xs transition duration-300 shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>استلام الهدية المجانية الآن 🎁</span>
+              </button>
             </div>
-          )
+          );
         })}
       </div>
-      
+
+      {/* Direct WhatsApp Venting Box in Store */}
+      <div className="bg-gradient-to-l from-emerald-900 via-teal-950 text-white rounded-[2.5rem] p-8 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="space-y-3 text-right flex-1">
+          <span className="bg-white/10 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full inline-flex items-center gap-1">
+            <WhatsAppIcon className="w-3.5 h-3.5" />
+            <span>خدمة الاستماع الفوري عبر الواتساب</span>
+          </span>
+          <h3 className="text-xl font-black">بحاجة إلى التحدث مع شخص حقيقي بصورة فورية ومجانية؟</h3>
+          <p className="text-xs text-slate-200 leading-relaxed">
+            منصتنا مجانية تماماً لخدمة البنات والنساء في الوطن العربي. تواصل معنا مباشرة عبر الواتساب على الرقم <strong className="text-emerald-400 font-mono dir-ltr">{WHATSAPP_NUMBER}</strong> لنكون معك في كل لحظة ضيق أو احتياج للدعم.
+          </p>
+        </div>
+        <a 
+          href={getWhatsAppUrl("مرحباً، أود التحدث مع مستمع حقيقي والفضفضة عبر الواتساب 🌸")}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-6 py-4 rounded-2xl shadow-md transition flex items-center gap-2 shrink-0 whitespace-nowrap"
+        >
+          <WhatsAppIcon className="w-4 h-4" />
+          <span>تواصل عبر الواتساب 💬</span>
+        </a>
+      </div>
+
     </div>
   );
 }

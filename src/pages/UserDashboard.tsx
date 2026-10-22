@@ -445,23 +445,25 @@ export default function UserDashboard() {
               </div>
 
               <div className="text-right">
-                <label className="block text-xs font-bold text-slate-700 mb-2">سيرتكِ الذاتية / كلمات طيبة تصف روحكِ (اختياري)</label>
+                <label className="block text-xs font-bold text-slate-700 mb-2">نبذة عنكِ / السيرة الكنفية (اختياري)</label>
                 <textarea
                   value={editBio}
                   onChange={e=>setEditBio(e.target.value)}
-                  placeholder="اكتبِ لمحة قصيرة عن تفضيلاتك في الفضفضة لتساعد صديقاتكِ على تبادل طمأنينة..."
+                  placeholder="مثال: أحب مشاركة السلام والمصارحة بكل رقي وأمان..."
                   rows={2}
-                  className="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-sm text-right"
+                  className="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-right text-sm"
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={profileLoading}
-                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-extrabold py-4 rounded-2xl shadow-lg transition-transform active:scale-95 text-sm"
-              >
-                {profileLoading ? "جاري الحفظ والتوثيق..." : "تفعيل حسابي وبدء الفضفضة الآمنة 🌸✨"}
-              </button>
+              <div className="pt-2 text-center">
+                <button
+                  type="submit"
+                  disabled={profileLoading}
+                  className="w-full bg-gradient-to-l from-teal-600 to-emerald-500 hover:from-teal-700 hover:to-emerald-600 text-white font-black py-4 px-6 rounded-2xl transition duration-200 shadow-lg shadow-teal-500/10 active:scale-[0.98] disabled:opacity-50"
+                >
+                  {profileLoading ? "جاري تجهيز حسابكِ الشخصي..." : "ابدئي رحلتكِ الجميلة الآن ✨"}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -471,8 +473,8 @@ export default function UserDashboard() {
       {showProfileModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[999] flex items-center justify-center p-4">
           <div className="bg-white rounded-[2rem] shadow-xl p-6 md:p-8 w-full max-w-xl border border-slate-100 text-right max-h-[92vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-slate-800 mb-2">تعديل ملفكِ الشخصي الكامل</h2>
-            <p className="text-slate-500 text-xs mb-6">غيري معلوماتك، رمزكِ، وفئتكِ العمرية متى شئتِ بكل خصوصية.</p>
+            <h2 className="text-xl font-black text-slate-800 mb-2">تعديل الملف الشخصي</h2>
+            <p className="text-slate-500 text-xs mb-6">غير معلوماتك، رمزك المفضل، وفئتك العمرية متى شئت بكل خصوصية وأمان.</p>
 
             {profileError && (
               <div className="bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold p-3 rounded-xl mb-4 text-center">
@@ -489,8 +491,8 @@ export default function UserDashboard() {
                       key={`edit-${emoji}`}
                       type="button"
                       onClick={() => setEditAvatarEmoji(emoji)}
-                      className={`text-xl w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                        editAvatarEmoji === emoji ? "bg-white border-2 border-teal-500 shadow-sm scale-110" : ""
+                      className={`text-2xl w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                        editAvatarEmoji === emoji ? "bg-white border-2 border-plum shadow-sm scale-110 font-bold" : "grayscale-30 hover:grayscale-0 hover:scale-105"
                       }`}
                     >
                       {emoji}
@@ -501,41 +503,53 @@ export default function UserDashboard() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-right">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">الاسم المستعار</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">الاسم المستعار (الذي يظهر للجميع)</label>
                   <input
                     type="text"
                     required
                     value={editDisplayName}
                     onChange={(e) => setEditDisplayName(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-right"
+                    className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-plum/20 text-right font-semibold"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">بطاقة المعرّف للرابط</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">اسم المستخدم المستعار (لاتيني للروابط)</label>
                   <input
                     type="text"
                     required
                     value={editUsername}
                     onChange={(e) => setEditUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                    className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-left"
+                    className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-plum/20 text-left font-mono"
                     dir="ltr"
                   />
+                  <span className="text-[9px] text-slate-400 mt-0.5 block text-left">/u/{editUsername || "username"}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-right">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">العمر</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">العمر والصفة</label>
                   <select 
                     value={editAge}
                     onChange={e=>setEditAge(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl p-3 text-sm bg-white"
+                    className="w-full border border-slate-200 rounded-xl p-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-plum/20 text-right"
                   >
-                    <option value="تحت 18 سنة (فتاة مراهقة)">تحت 18 سنة (فتاة مراهقة)</option>
-                    <option value="18 - 25 سنة (شابة يافعة)">18 - 25 سنة (شابة يافعة)</option>
-                    <option value="26 - 40 سنة (سيدة ناضجة)">26 - 40 سنة (سيدة ناضجة)</option>
-                    <option value="فوق 40 سنة (سيدة حكيمة)">فوق 40 سنة (سيدة حكيمة)</option>
+                    {localStorage.getItem("userGender") === "male" ? (
+                      <>
+                        <option value="تحت 18 سنة (شاب يافع مراهق)">تحت 18 سنة (شاب يافع مراهق)</option>
+                        <option value="18 - 25 سنة (شاب يافع وطموح)">18 - 25 سنة (شاب يافع وطموح)</option>
+                        <option value="26 - 40 سنة (رجل ناضج)">26 - 40 سنة (رجل ناضج)</option>
+                        <option value="فوق 40 سنة (رجل حكيم)">فوق 40 سنة (رجل حكيم)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="تحت 18 سنة (فتاة مراهقة)">تحت 18 سنة (فتاة مراهقة)</option>
+                        <option value="18 - 25 سنة (شابة يافعة)">18 - 25 سنة (شابة يافعة)</option>
+                        <option value="26 - 40 سنة (سيدة ناضجة)">26 - 40 سنة (سيدة ناضجة)</option>
+                        <option value="فوق 40 سنة (سيدة حكيمة)">فوق 40 سنة (سيدة حكيمة)</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
@@ -544,7 +558,7 @@ export default function UserDashboard() {
                   <select 
                     value={editCountry}
                     onChange={e=>setEditCountry(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl p-3 text-sm bg-white"
+                    className="w-full border border-slate-200 rounded-xl p-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-plum/20 text-right"
                   >
                     <option value="مصر">مصر 🇪🇬</option>
                     <option value="السعودية">السعودية 🇸🇦</option>
@@ -562,12 +576,13 @@ export default function UserDashboard() {
               </div>
 
               <div className="text-right">
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">السير الكنفية</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">السير الكنفية / النبذة التعريفية الشخصية (اختياري)</label>
                 <textarea
                   value={editBio}
                   onChange={e=>setEditBio(e.target.value)}
                   rows={2}
-                  className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-right"
+                  className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-plum/20 text-right"
+                  placeholder="اكتبِ لمحة قصيرة لطيفة تصف روحك..."
                 />
               </div>
 
@@ -575,16 +590,16 @@ export default function UserDashboard() {
                 <button
                   type="button"
                   onClick={() => setShowProfileModal(false)}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-500 text-xs font-bold hover:bg-slate-50"
+                  className="px-5 py-2 rounded-xl border border-slate-200 text-slate-500 text-xs font-bold hover:bg-slate-50"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
                   disabled={profileLoading}
-                  className="px-6 py-2.5 rounded-xl bg-teal-600 text-white text-xs font-bold hover:bg-teal-700 disabled:opacity-50"
+                  className="px-6 py-2 rounded-xl bg-plum hover:bg-velvet text-white text-xs font-bold disabled:opacity-50 transition active:scale-95"
                 >
-                  حفظ التعديلات
+                  {profileLoading ? "جاري الحفظ..." : "حفظ التعديلات"}
                 </button>
               </div>
             </form>
@@ -597,9 +612,9 @@ export default function UserDashboard() {
         <div className="flex flex-col sm:flex-row items-center gap-3 order-2 md:order-1">
           <button 
             onClick={() => setShowProfileModal(true)}
-            className="text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 px-4 py-2 rounded-xl border border-slate-200 hover:border-teal-200 flex items-center gap-1.5 text-xs transition-all font-semibold shadow-sm bg-white"
+            className="text-slate-600 hover:text-plum hover:bg-plum/5 px-4 py-2 rounded-xl border border-slate-200 hover:border-plum/20 flex items-center gap-1.5 text-xs transition-all font-semibold shadow-sm bg-white"
           >
-            <Settings className="w-3.5 h-3.5 text-teal-600" /> تعديل الملف الكامل
+            <Settings className="w-3.5 h-3.5 text-plum" /> تعديل الملف الكامل
           </button>
           <button 
             onClick={logout} 
@@ -613,9 +628,9 @@ export default function UserDashboard() {
           <div className="flex items-center gap-4 bg-white p-3 pr-5 pl-4 rounded-3xl border border-slate-100 shadow-sm">
             <div className="text-right">
               <h1 className="text-xl font-bold text-slate-800 flex items-center gap-1.5 justify-end">
-                أهلاً بكِ، {profile?.displayName || username}
-                {profile?.subscriptionType === 'diamond' && <span className="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse">💎 ماسية</span>}
-                {profile?.subscriptionType === 'golden' && <span className="bg-yellow-100 text-yellow-700 text-[10px] px-2 py-0.5 rounded-full font-black">👑 ذهبية</span>}
+                {localStorage.getItem("userGender") === "male" ? "أهلاً بكَ، " : "أهلاً بكِ، "}{profile?.displayName || username}
+                {profile?.subscriptionType === 'diamond' && <span className="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse">💎 ماسي</span>}
+                {profile?.subscriptionType === 'golden' && <span className="bg-yellow-100 text-yellow-700 text-[10px] px-2 py-0.5 rounded-full font-black">👑 ذهبي</span>}
               </h1>
               <p className="text-slate-400 flex items-center justify-end gap-1.5 mt-0.5 text-xs">
                 <span className="font-mono">@{profile?.username || username}</span> • 
@@ -625,7 +640,7 @@ export default function UserDashboard() {
               </p>
             </div>
 
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-50 to-indigo-50 border border-teal-100/50 flex items-center justify-center text-3xl shadow-sm hover:rotate-6 transition-transform">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-gold/10 to-plum/5 border border-plum/10 flex items-center justify-center text-3xl shadow-sm hover:rotate-6 transition-transform">
               {profile?.avatarEmoji || "🌸"}
             </div>
           </div>
@@ -638,24 +653,28 @@ export default function UserDashboard() {
             )}
             <button
                onClick={() => navigate('/store')} 
-               className="bg-teal-100 text-teal-700 hover:bg-teal-200 text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1 transition-colors"
+               className="bg-plum/5 text-plum hover:bg-plum/10 text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1 transition-colors"
             >
-              شحن الرصيد / ترقية الإشتراك
+              شحن الرصيد / ترقية الاشتراك
             </button>
           </div>
         </div>
       </div>
 
       {/* Share Box */}
-      <div className="bg-gradient-to-tr from-indigo-600 via-teal-600 to-emerald-500 rounded-3xl p-8 md:p-10 text-white mb-10 shadow-xl relative overflow-hidden text-right">
+      <div className="bg-gradient-to-tr from-plum via-velvet to-rose-gold rounded-3xl p-8 md:p-10 text-white mb-10 shadow-xl relative overflow-hidden text-right">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full blur-2xl translate-y-1/4 -translate-x-1/4 pointer-events-none"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
           <div className="flex-1 text-center md:text-right">
-            <h2 className="text-3xl font-black mb-3">شاركي رابطكِ السري!</h2>
-            <p className="text-emerald-50 mb-8 max-w-xl leading-relaxed text-sm md:text-base opacity-90 mx-auto md:mx-0">
-              انسخي الرابط وشاركي صديقاتك في حالات الواتساب، انستجرام أو فيسبوك، واستقبلي رسائل المصارحة المجهولة بكل طمأنينة وسرية مطلقة دون معرفة الهوية!
+            <h2 className="text-3xl font-black mb-3">
+              {localStorage.getItem("userGender") === "male" ? "شارك رابطك السري!" : "شاركي رابطكِ السري!"}
+            </h2>
+            <p className="text-rose-100 mb-8 max-w-xl leading-relaxed text-sm md:text-base opacity-95 mx-auto md:mx-0 font-medium">
+              {localStorage.getItem("userGender") === "male" 
+                ? "انسخ الرابط وشاركه في حالات الواتساب، انستغرام أو فيسبوك، واستقبل رسائل المصارحة المجهولة والفضفضة دون تطفل ومعرفة الهوية في سرية مجهولة مطلقة!"
+                : "انسخي الرابط وشاركي صديقاتكِ في حالات الواتساب، انستغرام أو فيسبوك، واستقبلي رسائل المصارحة المجهولة والفضفضة دون تطفل ومعرفة الهوية في سرية مجهولة مطلقة!"}
             </p>
             
             <div className="flex flex-col sm:flex-row-reverse items-stretch sm:items-center gap-3">
@@ -671,14 +690,14 @@ export default function UserDashboard() {
               <div className="flex gap-2 shrink-0 justify-center">
                 <button 
                   onClick={copyLink}
-                  className="bg-white/20 hover:bg-white text-white hover:text-teal-750 backdrop-blur-md px-5 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm text-sm"
+                  className="bg-white/20 hover:bg-white text-white hover:text-plum backdrop-blur-md px-5 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm text-sm"
                 >
                   {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                   {copied ? "تم النسخ!" : "نسخ الرابط"}
                 </button>
                 <button 
                   onClick={shareNative}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-white px-5 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-500/20 text-sm"
+                  className="bg-velvet hover:bg-plum/90 text-white px-5 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-md text-sm"
                 >
                   <Share2 className="w-5 h-5" />
                   مشاركة فورية
@@ -937,22 +956,42 @@ export default function UserDashboard() {
                 </p>
               </div>
             ) : (
-              messages.map((msg, idx) => (
-                <div key={`${msg.id}-${idx}`} className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm relative group hover:border-indigo-100 flex flex-col">
-                  <button 
-                    onClick={() => deleteMessage(msg.id)}
-                    className="absolute top-4 left-4 p-1.5 bg-slate-50 text-slate-400 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-rose-100 hover:text-rose-500 transition-all"
+              messages.map((msg, idx) => {
+                const isOfficial = msg.message && (msg.message.includes("إدارة \"فضفضة أونلاين\"") || msg.message.includes("عائلة إدارة"));
+                return (
+                  <div 
+                    key={`${msg.id}-${idx}`} 
+                    className={`p-5 rounded-3xl border relative group flex flex-col transition-all ${
+                      isOfficial 
+                        ? "bg-rose-50/20 border-pink-200/60 shadow-md shadow-pink-100/30 hover:border-pink-300" 
+                        : "bg-white border-slate-100 shadow-sm hover:border-indigo-100"
+                    }`}
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                  <p className="text-slate-700 text-xs leading-relaxed mb-4 whitespace-pre-wrap">{msg.message}</p>
-                  
-                  <div className="flex items-center justify-between text-[10px] text-slate-450 border-t border-slate-50 pt-2 font-mono">
-                    <span className="text-slate-400 font-bold text-[9px] bg-slate-50 px-2 py-0.5 rounded-md">🔒 مجهول</span>
-                    <span>{new Date(msg.createdAt).toLocaleDateString("ar-EG")}</span>
+                    <button 
+                      onClick={() => deleteMessage(msg.id)}
+                      className="absolute top-4 left-4 p-1.5 bg-slate-50 text-slate-400 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-rose-100 hover:text-rose-500 transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                    <p className={`text-xs leading-relaxed mb-4 whitespace-pre-wrap ${isOfficial ? "text-slate-800 font-medium" : "text-slate-700"}`}>
+                      {msg.message}
+                    </p>
+                    
+                    <div className="flex items-center justify-between text-[10px] text-slate-450 border-t border-slate-50 pt-2 font-mono">
+                      {isOfficial ? (
+                        <span className="text-pink-600 font-bold text-[9px] bg-pink-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          👑 ترحيب رسمي آمن
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 font-bold text-[9px] bg-slate-50 px-2 py-0.5 rounded-md">
+                          🔒 مجهول
+                        </span>
+                      )}
+                      <span>{new Date(msg.createdAt).toLocaleDateString("ar-EG")}</span>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

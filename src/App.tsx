@@ -9,14 +9,13 @@ import {
   MailOpen, 
   ShieldAlert, 
   Lock, 
-  Unlock, 
-  LogOut, 
   User, 
   Sparkles,
-  ArrowLeft
+  Shield
 } from "lucide-react";
 import Home from "./pages/Home";
 import Venting from "./pages/Venting";
+import Logo from "./components/Logo";
 import MoodHub from "./pages/MoodHub";
 import Relaxation from "./pages/Relaxation";
 import Community from "./pages/Community";
@@ -27,7 +26,11 @@ import UserDashboard from "./pages/UserDashboard";
 import PublicProfile from "./pages/PublicProfile";
 import Members from "./pages/Members";
 import Store from "./pages/Store";
+import SeoHub from "./pages/SeoHub";
+import SocialHub from "./pages/SocialHub";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import { cn } from "./lib/utils";
+import { WhatsAppFloatingButton, WhatsAppIcon, WHATSAPP_NUMBER, getWhatsAppUrl } from "./components/WhatsAppSupport";
 
 export default function App() {
   const location = useLocation();
@@ -38,7 +41,6 @@ export default function App() {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [avatarEmoji, setAvatarEmoji] = useState<string>("🌸");
-  const [userCountry, setUserCountry] = useState<string>("🗺️");
 
   useEffect(() => {
     setUserId(localStorage.getItem("userId"));
@@ -46,7 +48,6 @@ export default function App() {
     setDisplayName(localStorage.getItem("displayName"));
     setUserEmail(localStorage.getItem("userEmail"));
     setAvatarEmoji(localStorage.getItem("userAvatarEmoji") || "🌸");
-    setUserCountry(localStorage.getItem("userCountry") || "الوطن العربي");
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -65,36 +66,20 @@ export default function App() {
     navigate("/");
   };
 
-  const isUserAdmin = userEmail && userEmail.toLowerCase() === "ehabgm200@gmail.com";
+  const isUserAdmin = userEmail && ["ehabgm200@gmail.com", "ehabgm20000@gmail.com", "ehabgm2000@gmail.com"].includes(userEmail.toLowerCase());
 
+  // Organized navigation items separating public/internet/AI features from private member & admin features
   const navItems = [
-    { name: "الرئيسية", path: "/", icon: HeartHandshake, guestFriendly: true },
-    { name: "خزانة الأسرار", path: "/venting", icon: MessageSquareHeart, guestFriendly: true },
-    { name: "مؤشر الوجدان", path: "/mood", icon: HeartPulse, guestFriendly: true },
-    { name: "متنفس السكينة", path: "/relax", icon: Ear, guestFriendly: true },
-    { name: "متجر المنصة", path: "/store", icon: Sparkles, guestFriendly: false },
-    { name: "رسائل مجهولة", path: "/dashboard", icon: MailOpen, guestFriendly: false },
-    { name: "مجتمع الفتيات", path: "/community", icon: Users, guestFriendly: true },
-    { name: "دليل العضوات", path: "/members", icon: Users, guestFriendly: false },
+    { name: "الرئيسية", path: "/", icon: HeartHandshake, guestFriendly: true, category: "public" },
+    { name: "خزانة الأسرار", path: "/venting", icon: MessageSquareHeart, guestFriendly: true, category: "public" },
+    { name: "مؤشر الوجدان", path: "/mood", icon: HeartPulse, guestFriendly: true, category: "public" },
+    { name: "متنفس السكينة", path: "/relax", icon: Ear, guestFriendly: true, category: "public" },
+    { name: "مجتمع الفتيات", path: "/community", icon: Users, guestFriendly: true, category: "public" },
+    { name: "متجر المنصة المجاني", path: "/store", icon: Sparkles, guestFriendly: true, category: "public" },
+    { name: "رسائل مجهولة", path: "/dashboard", icon: MailOpen, guestFriendly: false, category: "member" },
+    { name: "دليل العضوات", path: "/members", icon: Users, guestFriendly: false, category: "member" },
+    { name: "سياسة الخصوصية", path: "/privacy", icon: Shield, guestFriendly: true, category: "public" },
   ];
-
-  const COUNTRY_FLAGS: { [key: string]: string } = {
-    "مصر": "🇪🇬",
-    "السعودية": "🇸🇦",
-    "المغرب": "🇲🇦",
-    "الجزائر": "🇩🇿",
-    "العراق": "🇮🇶",
-    "تونس": "🇹🇳",
-    "سوريا ولبنان": "🇸🇾",
-    "الأردن وفلسطين": "🇯🇴",
-    "اليمن والسودان": "🇾🇪",
-    "الخليج العربي العام": "🇦🇪",
-    "الوطن العربي": "🗺️"
-  };
-
-  const getFlag = (countryName: string) => {
-    return COUNTRY_FLAGS[countryName] || "🗺️";
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col rtl text-right">
@@ -104,16 +89,10 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             
-            {/* Logo/Brand on the right */}
+            {/* Logo/Brand on the right (fdfada.online Brand Identity) */}
             <div className="flex items-center gap-3">
-              <Link to="/" className="flex items-center gap-3">
-                <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-gradient-to-tr from-teal-400 to-emerald-400 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-500/20">
-                  <HeartHandshake className="w-5 h-5 md:w-6 md:h-6" />
-                </div>
-                <div className="text-right">
-                  <span className="font-extrabold text-base md:text-lg text-slate-900 block leading-tight">فضفضة أونلاين</span>
-                  <span className="text-[9px] md:text-[10px] text-teal-600 font-extrabold tracking-wide block">بوابة البوح الآمن والدعم النفسي 🌸🗝️</span>
-                </div>
+              <Link to="/">
+                <Logo size="sm" variant="horizontal" />
               </Link>
             </div>
 
@@ -129,7 +108,7 @@ export default function App() {
                     key={`header-nav-${item.path}-${idx}`}
                     to={isLockedForGuest ? "/login" : item.path}
                     className={cn(
-                      "flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all duration-200 font-bold text-xs whitespace-nowrap",
+                      "flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-200 font-bold text-xs whitespace-nowrap",
                       isActive 
                         ? "bg-slate-900 text-white shadow-sm" 
                         : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
@@ -142,7 +121,19 @@ export default function App() {
                 );
               })}
               
-              {/* Special Admin Link */}
+              {/* Special WhatsApp Live Venting Button */}
+              <a 
+                href={getWhatsAppUrl("مرحباً، أود الفضفضة والتحدث مع شخص مستمع وموثوق عبر الواتساب 🌸")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition-all bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:scale-105 active:scale-95 whitespace-nowrap"
+                title="فضفضي مع شخص حقيقي عبر الواتساب 01131416213"
+              >
+                <WhatsAppIcon className="w-4 h-4 shrink-0" />
+                <span>فضفضي مع شخص 💬</span>
+              </a>
+
+              {/* Special Admin Link - Visible only to admin */}
               {isUserAdmin && (
                 <Link 
                   to="/admin" 
@@ -237,6 +228,18 @@ export default function App() {
               );
             })}
             
+            {/* Special Mobile WhatsApp Venting Button */}
+            <a 
+              href={getWhatsAppUrl("مرحباً، أود الفضفضة والتحدث مع شخص مستمع وموثوق عبر الواتساب 🌸")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 bg-emerald-600 text-white px-3 py-2 rounded-xl text-[11px] font-black shrink-0 shadow-sm"
+              title="فضفضي مع شخص حقيقي عبر الواتساب"
+            >
+              <WhatsAppIcon className="w-3.5 h-3.5" />
+              <span>فضفضي مع شخص 💬</span>
+            </a>
+
             {/* Special Mobile Admin Link */}
             {isUserAdmin && (
               <Link 
@@ -262,13 +265,77 @@ export default function App() {
           <Route path="/members" element={<Members />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/store" element={<Store />} />
+          <Route path="/topics-trends" element={<SeoHub />} />
+          <Route path="/social-news" element={<SocialHub />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/u/:username" element={<PublicProfile />} />
         </Routes>
       </main>
+
+      {/* Global WhatsApp Floating Button for Instant Real Person Venting */}
+      <WhatsAppFloatingButton />
+
+      {/* Persistent SEO & Content Footer representing fdfada.online */}
+      <footer className="bg-slate-900 text-slate-400 py-12 px-4 border-t border-slate-800 text-right" dir="rtl">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="space-y-4">
+            <Logo size="xs" variant="horizontal" inverted={true} />
+            <p className="text-xs leading-relaxed text-slate-400">
+              أول منصة تواصل وتفريغ نفسي غيابية مع رسائل صراحة مجهولة مخصصة للفتيات والنساء بالوطن العربي بخصوصية تامة 🛡️
+            </p>
+            <div className="pt-2">
+              <span className="text-[11px] font-bold text-slate-300 block mb-1">فضفضة مباشرة مع شخص حقيقي:</span>
+              <a 
+                href={getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black px-3.5 py-2 rounded-xl transition shadow-sm"
+              >
+                <WhatsAppIcon className="w-4 h-4" />
+                <span>واتساب: {WHATSAPP_NUMBER}</span>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h4 className="text-white font-bold text-xs mb-3">خرائط وروابط المنصة</h4>
+            <ul className="space-y-2 text-xs">
+              <li><Link to="/venting" className="hover:text-white transition-colors">خزانة الأسرار والبوح للزوار</Link></li>
+              <li><Link to="/mood" className="hover:text-white transition-colors">مؤشر الوجدان والمواساة</Link></li>
+              <li><Link to="/relax" className="hover:text-white transition-colors">واحة السكينة والتنفس الموجه</Link></li>
+              <li><Link to="/community" className="hover:text-white transition-colors">مجتمعات وصالونات الدول العربية</Link></li>
+              <li><Link to="/social-news" className="text-blue-400 hover:text-white font-bold transition-colors">تابعونا فيسبوك ومجلة الأخبار 📣</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-bold text-xs mb-3">خدمات مجانية وأقسام</h4>
+            <ul className="space-y-2 text-xs">
+              <li><Link to="/store" className="hover:text-white transition-colors">متجر الكوينز والهدايا المجاني</Link></li>
+              <li><Link to="/members" className="hover:text-white transition-colors">دليل العضوات والرفيقات</Link></li>
+              <li><Link to="/register" className="hover:text-white transition-colors">تفعيل صندوق صراحة مجاني</Link></li>
+              <li><Link to="/privacy" className="text-teal-400 hover:text-white font-bold transition-colors">سياسة الخصوصية وحماية البيانات 🛡️</Link></li>
+              <li><Link to="/topics-trends" className="text-teal-400 hover:text-white font-bold transition-colors">موسوعة الصراحة والاتجاهات الـ SEO 📈</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-bold text-xs mb-3">بيانات النشر والتوثيق</h4>
+            <p className="text-xs leading-relaxed text-slate-400 mb-2">
+              نطاقنا المعتمد والرسمي هو: <strong className="text-teal-400">www.fdfada.online</strong>
+            </p>
+            <p className="text-xs leading-relaxed text-slate-400 mb-2">
+              للفضفضة مع شخص حقيقي وسرية تامة: <strong className="text-emerald-400 font-mono dir-ltr inline-block">{WHATSAPP_NUMBER}</strong>
+            </p>
+            <p className="text-[10px] text-slate-500">
+              جميع الحقوق محفوظة لمنصة فضفضة أونلاين © 2026. آمن، سري، ومحمي بالكامل ببروتوكولات الأمان.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
 
+// Missing LogOut import if needed
+import { LogOut } from "lucide-react";

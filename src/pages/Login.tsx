@@ -26,6 +26,7 @@ export default function Login() {
         localStorage.setItem("userId", data.userId);
         localStorage.setItem("username", data.username);
         localStorage.setItem("displayName", data.displayName || data.username);
+        localStorage.setItem("userGender", data.gender || "female");
         navigate("/dashboard");
       } else {
         setError(data.error || "خطأ في تسجيل الدخول");
@@ -61,6 +62,7 @@ export default function Login() {
         localStorage.setItem("username", data.username);
         localStorage.setItem("userEmail", user.email || "");
         localStorage.setItem("displayName", data.displayName || name);
+        localStorage.setItem("userGender", data.gender || "female");
         if (data.age) localStorage.setItem("userAge", data.age);
         if (data.country) localStorage.setItem("userCountry", data.country);
         navigate("/dashboard");
@@ -81,11 +83,11 @@ export default function Login() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-[2.2rem] border border-slate-100 shadow-xl shadow-slate-150/45 w-full max-w-md text-right">
-        <div className="w-12 h-12 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-6">
+        <div className="w-12 h-12 bg-plum/5 text-plum rounded-2xl flex items-center justify-center mb-6">
           <Lock className="w-6 h-6" />
         </div>
-        <h1 className="text-2xl font-black text-slate-800 mb-2">تسجيل الدخول للفتيات</h1>
-        <p className="text-slate-500 text-sm mb-6">ادخلي لحسابكِ الآمن لقراءة رسائل المصارحة المجهولة والتفاعل مع شقيقاتك.</p>
+        <h1 className="text-2xl font-black text-slate-800 mb-2">تسجيل الدخول الآمن</h1>
+        <p className="text-slate-500 text-sm mb-6 font-medium">ادخل لحسابك الموحد لقراءة رسائل المصارحة السرية والمشاركة في مجتمعاتنا الآمنة.</p>
 
         {error && <div className="bg-rose-50 border border-rose-100 text-rose-600 font-semibold p-4 rounded-2xl text-xs mb-5 flex items-center justify-center text-center leading-relaxed">{error}</div>}
 
@@ -112,35 +114,35 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-705 mb-1.5">اسم المستخدم المستعار</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">اسم المستخدم المستعار</label>
             <input 
               type="text" 
               required
               placeholder="مثال: fatima_safe"
               value={username}
               onChange={e=>setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-              className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-left text-sm" 
+              className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-plum/20 focus:border-plum text-left text-sm" 
               dir="ltr"
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-705 mb-1.5">كلمة المرور</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">كلمة المرور</label>
             <input 
               type="password" 
               required
               placeholder="••••••••"
               value={password}
               onChange={e=>setPassword(e.target.value)}
-              className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm" 
+              className="w-full border border-slate-200 rounded-2xl p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-plum/20 focus:border-plum text-sm" 
             />
           </div>
-          <button disabled={loading} type="submit" className="w-full bg-teal-600 text-white font-bold py-3.5 rounded-2xl hover:bg-teal-700 transition-colors mt-2 text-sm active:scale-95">
+          <button disabled={loading} type="submit" className="w-full bg-plum hover:bg-velvet text-white font-bold py-3.5 rounded-2xl transition-colors mt-2 text-sm active:scale-95 shadow-md shadow-plum/10">
             {loading ? "جاري الدخول السري..." : "تسجيل الدخول"}
           </button>
         </form>
 
         <p className="text-center text-sm text-slate-500 mt-6">
-          ليس لديك حساب؟ <Link to="/register" className="text-teal-600 font-bold hover:underline">أنشئ حساباً جديداً</Link>
+          ليس لديك حساب؟ <Link to="/register" className="text-plum font-bold hover:underline">أنشئ حساباً جديداً</Link>
         </p>
       </div>
     </div>

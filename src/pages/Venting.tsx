@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, LockKeyhole, UserRound, Bot, Loader2 } from "lucide-react";
+import { Send, LockKeyhole, UserRound, Bot, Loader2, Sparkles } from "lucide-react";
 import { cn } from "../lib/utils";
+import { WhatsAppIcon, WHATSAPP_NUMBER, getWhatsAppUrl } from "../components/WhatsAppSupport";
 
 interface Message {
   id: string;
@@ -13,7 +14,7 @@ export default function Venting() {
     {
       id: "init",
       role: "assistant",
-      content: "أهلاً بكِ يا حبيبتي في خزانة الأسرار.. هنا لا أحد يعرفك، ولا نحتفظ بأي معلومات عنك. بمجرد خروجك سيمحى كل شيء. اتفضلي، قوليلي إيه اللي مزعلك ومضايقك؟ أنا هنا عشان أسمعك."
+      content: "أهلاً بكِ يا حبيبتي في خزانة الأسرار.. هنا لا أحد يعرفك، ولا نحتفظ بأي معلومات عنك. بمجرد خروجك سيمحى كل شيء. اتفضلي، قوليلي إيه اللي مزعلك ومضايقك؟ أنا هنا عشان أسمعك. (وإذا كنتِ تفضلين التحدث والفضفضة مع شخص حقيقي ومستمعة تفهمك، يمكنكِ التواصل معنا مباشرة عبر الواتساب على 01131416213 🌸)."
     }
   ]);
   const [input, setInput] = useState("");
@@ -80,6 +81,43 @@ export default function Venting() {
             <p className="text-xs text-slate-500">محادثة سرية وآمنة 100% (Zero-Trust)</p>
           </div>
         </div>
+
+        <a
+          href={getWhatsAppUrl("مرحباً، أود الفضفضة والتحدث مع شخص مستمع وموثوق من فضفضة أونلاين عبر الواتساب 🌸")}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden sm:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black px-4 py-2.5 rounded-2xl transition shadow-sm active:scale-95"
+        >
+          <WhatsAppIcon className="w-4 h-4" />
+          <span>تفضفضي مع شخص حقيقي (واتساب)</span>
+        </a>
+      </div>
+
+      {/* Direct WhatsApp Callout for Human Listening */}
+      <div className="bg-gradient-to-r from-emerald-50 via-teal-50/80 to-emerald-50 border-b border-emerald-200/80 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 text-right" dir="rtl">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <WhatsAppIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black text-slate-800">عاوزة تفضفضي مع شخص حقيقي يسمعك؟</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            </div>
+            <p className="text-[11px] text-slate-600 font-medium">
+              تحدثي معنا بخصوصية وسرية مطلقة عبر الواتساب: <strong className="font-mono text-emerald-800 dir-ltr inline-block">{WHATSAPP_NUMBER}</strong>
+            </p>
+          </div>
+        </div>
+        <a
+          href={getWhatsAppUrl("مرحباً، أود الفضفضة والتحدث مع شخص مستمع وموثوق عبر الواتساب 🌸")}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black px-4 py-2 rounded-xl flex items-center justify-center gap-2 transition shadow-sm active:scale-95 whitespace-nowrap text-center"
+        >
+          <WhatsAppIcon className="w-4 h-4" />
+          <span>ابدأي الفضفضة بالواتساب الآن 💬</span>
+        </a>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">

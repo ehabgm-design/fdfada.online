@@ -2,14 +2,21 @@
 
 @theme {
   --font-sans: "Tajawal", ui-sans-serif, system-ui, sans-serif;
-  --color-primary: #5eead4;
-  --color-secondary: #f472b6;
-  --color-accent: #818cf8;
+  
+  /* Brand Identity Colors */
+  --color-plum: #3B1E43;
+  --color-rose-gold: #B76E79;
+  --color-velvet: #682C53;
+  --color-warm: #FBF8F3;
+  
+  --color-primary: #B76E79;
+  --color-secondary: #3B1E43;
+  --color-accent: #682C53;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #FBF8F3; /* Warm Off-White body as per brand palette */
+  color: #1e1b4b; /* Royal deep text */
 }
 

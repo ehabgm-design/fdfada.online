@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Frown, ThermometerSnowflake, Flame, ArrowRight, UserRound, TrendingUp, CheckCircle2 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
+import GuestLock from "../components/GuestLock";
+import { WhatsAppVentCard } from "../components/WhatsAppSupport";
 
 type Mood = "sad" | "anxious" | "angry" | "lonely" | null;
 
@@ -36,13 +38,26 @@ const getStoredMoods = (): MoodLog[] => {
 };
 
 export default function MoodHub() {
+  const currentUserId = localStorage.getItem("userId");
   const [selectedMood, setSelectedMood] = useState<Mood>(null);
   const [moodHistory, setMoodHistory] = useState<MoodLog[]>([]);
   const [savedToday, setSavedToday] = useState(false);
 
   useEffect(() => {
-    setMoodHistory(getStoredMoods());
-  }, []);
+    if (currentUserId) {
+      setMoodHistory(getStoredMoods());
+    }
+  }, [currentUserId]);
+
+  if (!currentUserId) {
+    return (
+      <GuestLock 
+        title="مؤشر الوجدان والتحليل النفسي التفاعلي 📈"
+        description="تابعي وتتبعي حالتك الشعورية يومياً، واحصلي على إسعافات ورسائل مواساة مصممة بالذكاء الاصطناعي لتقويم مزاجك وراحتك الفسيولوجية. هذا القسم خاص بالعضوات فقط."
+        featureBadge="مؤشر الوجدان المغلق"
+      />
+    );
+  }
 
   const moods = [
     {
@@ -271,6 +286,15 @@ export default function MoodHub() {
             </AreaChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      {/* WhatsApp Human Venting Card */}
+      <div className="mt-8">
+        <WhatsAppVentCard 
+          title="تشعرين بضيق أو وحدة وبحاجة لمستمعة حقيقية تفهمك؟ 🌸"
+          description="إذا كان الكلام مع النفس أو المؤشر لا يكفي، وأنتِ بحاجة لشخص حقيقي يسمعك ويفضفض معاكِ بسرية مطلقة وبدون أي أحكام.. تواصلي معنا عبر الواتساب على مدار الساعة."
+          badge="مستمعة حقيقية بانتظارك"
+        />
       </div>
     </div>
   );

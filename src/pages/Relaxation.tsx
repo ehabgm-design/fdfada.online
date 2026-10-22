@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Play, Square, Volume2, CloudRain, Waves, Heart, Droplet, Sparkles, RefreshCw, Layers } from "lucide-react";
 import { cn } from "../lib/utils";
+import GuestLock from "../components/GuestLock";
+import { WhatsAppVentCard } from "../components/WhatsAppSupport";
 
 // Affirmations based on selected struggle
 const GARDEN_AFFIRMATIONS: Record<string, { advice: string; affirmation: string; flower: string; color: string }> = {
@@ -32,6 +34,7 @@ const GARDEN_AFFIRMATIONS: Record<string, { advice: string; affirmation: string;
 };
 
 export default function Relaxation() {
+  const currentUserId = localStorage.getItem("userId");
   const [activeSubTab, setActiveSubTab] = useState<"breathing" | "garden">("breathing");
 
   // Breathing & Noise state
@@ -179,6 +182,16 @@ export default function Relaxation() {
     setGardenStep("choose");
     setWaterCount(0);
   };
+
+  if (!currentUserId) {
+    return (
+      <GuestLock 
+        title="متنفس السكينة والهدوء الروحي 🌸"
+        description="استمتعي بتجربة روتين التنفس الموجه ومحاكي الطبيعة التفاعلي لتهدئة ضربات القلب وتخفيف ضغوط يومكِ المتواصلة. هذا النشاط مخصص حصريًا لعضوات المنصة."
+        featureBadge="غرفة السكينة المغلقة"
+      />
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-8 flex flex-col items-center">
@@ -465,6 +478,15 @@ export default function Relaxation() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* WhatsApp Human Venting Option */}
+      <div className="w-full mt-10">
+        <WhatsAppVentCard 
+          title="هل ما زال القلق يثقل صدرك؟ فضفضي مع شخص حقيقي 🌸"
+          description="التنفس والسكينة خطوة ممتازة، لكن التحدث مع إنسانة مستمعة وموثوقة قد يكون الدواء الشافي لقلبك. تواصلي معنا عبر الواتساب بدون تسجيل وبسرية تامة."
+          badge="مستمعة حقيقية لمواساتك"
+        />
+      </div>
     </div>
   );
 }
