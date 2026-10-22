@@ -86,18 +86,18 @@ export default function App() {
       
       {/* Top Premium Sticky Header */}
       <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-slate-200 z-50 shadow-sm w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-11 md:h-12">
             
             {/* Logo/Brand on the right (fdfada.online Brand Identity) */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 shrink-0">
               <Link to="/">
-                <Logo size="sm" variant="horizontal" />
+                <Logo size="xs" variant="horizontal" />
               </Link>
             </div>
 
             {/* Horizontal Navigation Middle Links (Desktop) */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+            <nav className="hidden lg:flex items-center gap-1">
               {navItems.map((item, idx) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path || (item.path === '/dashboard' && (location.pathname === '/login' || location.pathname === '/register'));
@@ -108,14 +108,15 @@ export default function App() {
                     key={`header-nav-${item.path}-${idx}`}
                     to={isLockedForGuest ? "/login" : item.path}
                     className={cn(
-                      "flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-200 font-bold text-xs whitespace-nowrap",
+                      "relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all duration-200 font-bold text-[11px] whitespace-nowrap",
                       isActive 
                         ? "bg-slate-900 text-white shadow-sm" 
                         : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                     )}
                   >
-                    <Icon className="w-4 h-4 shrink-0" />
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
                     <span>{item.name}</span>
+                    {isActive && <span className="absolute -bottom-1 right-1/2 translate-x-1/2 w-4 h-0.5 bg-teal-400 rounded-full"></span>}
                     {isLockedForGuest && <Lock className="w-3 h-3 text-amber-500" />}
                   </Link>
                 );
@@ -126,10 +127,10 @@ export default function App() {
                 href={getWhatsAppUrl("مرحباً، أود الفضفضة والتحدث مع شخص مستمع وموثوق عبر الواتساب 🌸")}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition-all bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:scale-105 active:scale-95 whitespace-nowrap"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-black transition-all bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:scale-105 active:scale-95 whitespace-nowrap"
                 title="فضفضي مع شخص حقيقي عبر الواتساب 01131416213"
               >
-                <WhatsAppIcon className="w-4 h-4 shrink-0" />
+                <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
                 <span>فضفضي مع شخص 💬</span>
               </a>
 
@@ -137,63 +138,63 @@ export default function App() {
               {isUserAdmin && (
                 <Link 
                   to="/admin" 
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-colors bg-amber-500 text-white hover:bg-amber-600 shadow-sm"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-black transition-colors bg-amber-500 text-white hover:bg-amber-600 shadow-sm"
                 >
                   <ShieldAlert className="w-3.5 h-3.5" />
-                  <span>لوحة الإدارة 👑</span>
+                  <span>الإدارة 👑</span>
                 </Link>
               )}
             </nav>
 
             {/* User Profile / Access Section */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               {userId ? (
                 /* Logged In */
-                <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 p-1 px-2.5 rounded-full md:rounded-2xl md:p-1.5 md:px-3">
-                  <div className="flex items-center gap-2 flex-row-reverse">
-                    <span className="text-xl md:text-2xl shrink-0">{avatarEmoji}</span>
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1 px-2.5 rounded-xl">
+                  <div className="flex items-center gap-1.5 flex-row-reverse">
+                    <span className="text-base shrink-0">{avatarEmoji}</span>
                     <div className="text-right hidden sm:block">
-                      <p className="text-[11px] md:text-xs font-black text-slate-800 leading-none">
+                      <p className="text-[11px] font-black text-slate-800 leading-none">
                         {displayName || `@${username}`}
                       </p>
                     </div>
                   </div>
 
-                  <span className="h-5 w-px bg-slate-200 hidden sm:block mx-1"></span>
+                  <span className="h-3.5 w-px bg-slate-200 hidden sm:block mx-0.5"></span>
 
                   <div className="flex items-center gap-1">
                     <Link 
                       to="/dashboard"
-                      className="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-xl transition text-xs font-bold"
+                      className="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 p-1 rounded-lg transition text-xs font-bold"
                       title="الملف الشخصي والرسائل"
                     >
-                      <User className="w-4 h-4" />
+                      <User className="w-3.5 h-3.5" />
                     </Link>
                     <button 
                       onClick={handleLogout}
-                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded-xl transition flex items-center justify-center font-bold text-xs gap-1"
+                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 p-1 rounded-lg transition flex items-center justify-center font-bold text-xs gap-1"
                       title="تسجيل الخروج الآمن"
                     >
-                      <LogOut className="w-4 h-4 shrink-0" />
-                      <span className="hidden md:inline font-extrabold text-[11px]">خروج</span>
+                      <LogOut className="w-3.5 h-3.5 shrink-0" />
+                      <span className="hidden md:inline font-extrabold text-[10px]">خروج</span>
                     </button>
                   </div>
                 </div>
               ) : (
                 /* Guest */
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                   <Link 
                     to="/login"
-                    className="text-slate-700 hover:bg-slate-100 font-extrabold text-xs px-3.5 py-2 rounded-xl transition duration-150"
+                    className="text-slate-700 hover:bg-slate-100 font-extrabold text-[11px] px-2 py-1.5 rounded-lg transition duration-150"
                   >
-                    تسجيل الدخول
+                    دخول
                   </Link>
                   <Link 
                     to="/register"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs px-4 py-2.5 rounded-xl transition duration-150 shadow-md shadow-indigo-600/15 flex items-center gap-1.5"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] px-2.5 py-1.5 rounded-lg transition duration-150 shadow-sm flex items-center gap-1"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    <span>انضمام للمجتمع 🌸</span>
+                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <span>انضمام 🌸</span>
                   </Link>
                 </div>
               )}
@@ -203,8 +204,8 @@ export default function App() {
         </div>
 
         {/* Horizontal tabs scrollable for mobile */}
-        <div className="lg:hidden border-t border-slate-100 bg-slate-50/70 py-2.5 overflow-x-auto scrollbar-none scroll-smooth">
-          <div className="max-w-7xl mx-auto px-4 flex items-center gap-1.5">
+        <div className="lg:hidden border-t border-slate-100 bg-slate-50/80 py-1 overflow-x-auto scrollbar-none scroll-smooth">
+          <div className="max-w-7xl mx-auto px-2 flex items-center gap-1">
             {navItems.map((item, idx) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path || (item.path === '/dashboard' && (location.pathname === '/login' || location.pathname === '/register'));
@@ -215,13 +216,13 @@ export default function App() {
                   key={`scroll-nav-${item.path}-${idx}`}
                   to={isLockedForGuest ? "/login" : item.path}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-150 font-bold text-[11px] whitespace-nowrap shrink-0",
+                    "flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all duration-150 font-bold text-[10px] whitespace-nowrap shrink-0",
                     isActive 
                       ? "bg-slate-900 text-white shadow-sm" 
-                      : "text-slate-600 bg-white border border-slate-100 hover:bg-slate-50"
+                      : "text-slate-600 bg-white border border-slate-200 hover:bg-slate-50"
                   )}
                 >
-                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <Icon className="w-3 h-3 shrink-0" />
                   <span>{item.name}</span>
                   {isLockedForGuest && <Lock className="w-2.5 h-2.5 text-amber-500" />}
                 </Link>
@@ -233,10 +234,10 @@ export default function App() {
               href={getWhatsAppUrl("مرحباً، أود الفضفضة والتحدث مع شخص مستمع وموثوق عبر الواتساب 🌸")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 bg-emerald-600 text-white px-3 py-2 rounded-xl text-[11px] font-black shrink-0 shadow-sm"
+              className="flex items-center gap-1 bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shrink-0 shadow-sm"
               title="فضفضي مع شخص حقيقي عبر الواتساب"
             >
-              <WhatsAppIcon className="w-3.5 h-3.5" />
+              <WhatsAppIcon className="w-3 h-3" />
               <span>فضفضي مع شخص 💬</span>
             </a>
 
@@ -244,7 +245,7 @@ export default function App() {
             {isUserAdmin && (
               <Link 
                 to="/admin" 
-                className="flex items-center gap-1 bg-amber-500 text-white px-3 py-2 rounded-xl text-[11px] font-black shrink-0 shadow-sm"
+                className="flex items-center gap-1 bg-amber-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shrink-0 shadow-sm"
               >
                 <ShieldAlert className="w-3.5 h-3.5" />
                 <span>الإدارة 👑</span>

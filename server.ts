@@ -325,58 +325,100 @@ async function startServer() {
 
   app.use(express.json());
 
-  // --- SEO Optimization Routes for Google & bing crawlers ---
+  // --- SEO Optimization & AI Crawler Integration Routes ---
   app.get("/robots.txt", (req, res) => {
     res.type("text/plain");
     res.send(`User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+# AI Crawlers & LLM Indexers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
 Sitemap: https://www.fdfada.online/sitemap.xml`);
   });
 
   app.get("/sitemap.xml", (req, res) => {
     res.type("application/xml");
+    const baseUrl = "https://www.fdfada.online";
+    const now = new Date().toISOString().split('T')[0];
+
+    const staticRoutes = [
+      { url: "/", priority: "1.0", changefreq: "daily" },
+      { url: "/venting", priority: "0.9", changefreq: "daily" },
+      { url: "/community", priority: "0.9", changefreq: "daily" },
+      { url: "/topics-trends", priority: "0.9", changefreq: "daily" },
+      { url: "/members", priority: "0.8", changefreq: "daily" },
+      { url: "/mood", priority: "0.8", changefreq: "weekly" },
+      { url: "/relax", priority: "0.8", changefreq: "monthly" },
+      { url: "/store", priority: "0.7", changefreq: "weekly" },
+      { url: "/privacy", priority: "0.5", changefreq: "monthly" },
+      { url: "/login", priority: "0.6", changefreq: "monthly" },
+      { url: "/register", priority: "0.8", changefreq: "monthly" }
+    ];
+
+    let urlsXml = staticRoutes.map(route => `  <url>
+    <loc>${baseUrl}${route.url}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>${route.changefreq}</changefreq>
+    <priority>${route.priority}</priority>
+  </url>`).join("\n");
+
+    // Add dynamic community posts
+    if (db.communityPosts) {
+      for (const p of db.communityPosts) {
+        if (p.id) {
+          const postDate = p.createdAt ? p.createdAt.split('T')[0] : now;
+          urlsXml += `
+  <url>
+    <loc>${baseUrl}/community#post-${p.id}</loc>
+    <lastmod>${postDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`;
+        }
+      }
+    }
+
+    // Add dynamic user public profiles
+    if (db.users) {
+      for (const u of db.users) {
+        if (u.username) {
+          urlsXml += `
+  <url>
+    <loc>${baseUrl}/profile/${encodeURIComponent(u.username)}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+        }
+      }
+    }
+
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://www.fdfada.online/</loc>
-    <priority>1.0</priority>
-    <changefreq>daily</changefreq>
-  </url>
-  <url>
-    <loc>https://www.fdfada.online/venting</loc>
-    <priority>0.9</priority>
-    <changefreq>daily</changefreq>
-  </url>
-  <url>
-    <loc>https://www.fdfada.online/mood</loc>
-    <priority>0.8</priority>
-    <changefreq>weekly</changefreq>
-  </url>
-  <url>
-    <loc>https://www.fdfada.online/relax</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://www.fdfada.online/store</loc>
-    <priority>0.7</priority>
-    <changefreq>weekly</changefreq>
-  </url>
-  <url>
-    <loc>https://www.fdfada.online/topics-trends</loc>
-    <priority>0.9</priority>
-    <changefreq>daily</changefreq>
-  </url>
-  <url>
-    <loc>https://www.fdfada.online/register</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://www.fdfada.online/login</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
+${urlsXml}
 </urlset>`;
     res.send(sitemap);
   });
@@ -1705,6 +1747,21 @@ Sitemap: https://www.fdfada.online/sitemap.xml`);
       appType: "spa",
     });
     app.use(vite.middlewares);
+    
+    app.use('*', async (req, res, next) => {
+      if (req.originalUrl.startsWith('/api')) {
+        return next();
+      }
+      try {
+        const templatePath = path.resolve(process.cwd(), 'index.html');
+        let template = await fs.readFile(templatePath, 'utf-8');
+        template = await vite.transformIndexHtml(req.originalUrl, template);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+      } catch (e) {
+        vite.ssrFixStacktrace(e as Error);
+        next(e);
+      }
+    });
   } else {
     // --- Production Static Serving ---
     const distPath = path.join(process.cwd(), 'dist');

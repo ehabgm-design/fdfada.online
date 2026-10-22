@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../lib/firebaseClient";
+import { parseResponseJson } from "../lib/utils";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -21,7 +22,7 @@ export default function Login() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
       });
-      const data = await res.json();
+      const data = await parseResponseJson(res);
       if (res.ok) {
         localStorage.setItem("userId", data.userId);
         localStorage.setItem("username", data.username);
@@ -31,8 +32,8 @@ export default function Login() {
       } else {
         setError(data.error || "خطأ في تسجيل الدخول");
       }
-    } catch(e) {
-      setError("حدث خطأ في الاتصال");
+    } catch(e: any) {
+      setError(e.message || "حدث خطأ في الاتصال");
     }
     setLoading(false);
   };
@@ -56,7 +57,7 @@ export default function Login() {
         })
       });
       
-      const data = await res.json();
+      const data = await parseResponseJson(res);
       if (res.ok) {
         localStorage.setItem("userId", data.userId);
         localStorage.setItem("username", data.username);

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserPlus } from "lucide-react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../lib/firebaseClient";
+import { parseResponseJson } from "../lib/utils";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -28,7 +29,7 @@ export default function Register() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, age, country, gender })
       });
-      const data = await res.json();
+      const data = await parseResponseJson(res);
       if (res.ok) {
         localStorage.setItem("userId", data.userId);
         localStorage.setItem("username", username);
@@ -40,8 +41,8 @@ export default function Register() {
       } else {
         setError(data.error === "Username taken" ? "اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر" : "خطأ غير معروف");
       }
-    } catch(e) {
-      setError("حدث خطأ في الاتصال");
+    } catch(e: any) {
+      setError(e.message || "حدث خطأ في الاتصال");
     }
     setLoading(false);
   };
@@ -63,7 +64,7 @@ export default function Register() {
         })
       });
       
-      const data = await res.json();
+      const data = await parseResponseJson(res);
       if (res.ok) {
         localStorage.setItem("userId", data.userId);
         localStorage.setItem("username", data.username);
